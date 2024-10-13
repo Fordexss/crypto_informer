@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>График топ 5 криптовалют</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <div style="width: 800px;">
+        <canvas id="cryptoChart"></canvas>
+    </div>
+
+    <script>
+        var chartData = {{ chart_data|safe }};
+
+        var datasets = [];
+        for (var symbol in chartData) {
+            datasets.push({
+                label: symbol,
+                data: chartData[symbol].map(function(data) {
+                    return { x: data.date, y: data.price };
+                }),
+                borderColor: getRandomColor(),
+                fill: false
+            });
+        }
+
+        var ctx = document.getElementById('cryptoChart').getContext('2d');
+        var chart = new Chart(ctx, {
+            type: 'line',
+            data: {
+                datasets: datasets
+            },
+            options: {
+                scales: {
+                    x: {
+                        type: 'time',
+                        time: {
+                            unit: 'day'
+                        }
+                    },
+                    y: {
+                        beginAtZero: false
+                    }
+                }
+            }
+        });
+
+        function getRandomColor() {
+            var letters = '0123456789ABCDEF';
+            var color = '#';
+            for (var i = 0; i < 6; i++) {
+                color += letters[Math.floor(Math.random() * 16)];
+            }
+            return color;
+        }
+    </script>
+</body>
+</html>

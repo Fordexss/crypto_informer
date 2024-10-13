@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Тренд цены {{ symbol }}</title>
+</head>
+<body>
+    <h1>Тренд цены {{ symbol }} за последний месяц</h1>
+    {% if graphic %}
+        <img src="data:image/png;base64,{{ graphic }}" alt="График цены {{ symbol }}">
+    {% else %}
+        <p>{{ error }}</p>
+    {% endif %}
+    <p><a href="{% url 'trends_default' %}">Показать график Bitcoin</a></p>
+</body>
+</html>
