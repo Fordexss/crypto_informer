@@ -57,6 +57,8 @@ class ConverterForm(forms.Form):
         super(ConverterForm, self).__init__(*args, **kwargs)
 
 
+# Не треба
+
 # class UpdateProfileForm(forms.ModelForm):
 #     nickname = forms.CharField(widget=forms.TextInput(attrs={'class': 'form-control'}))
 #     email = forms.EmailField(widget=forms.EmailInput(attrs={'class': 'form-control'}))

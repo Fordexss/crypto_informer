@@ -21,9 +21,6 @@ class IndexApiView(ListView):
 
     def get(self, request, *args, **kwargs):
         try:
-            news = get_crypto_news()
-            news_f_temp = [{'title': article['title'], 'url': article['url']} for article in news] if news else []
-
             top_crypto = get_top_crypto()
             if top_crypto:
                 for crypto in top_crypto:
@@ -37,7 +34,6 @@ class IndexApiView(ListView):
 
             return JsonResponse({
                 'top_crypto': list(page_obj),
-                'news': news_f_temp,
                 'has_next': page_obj.has_next(),
                 'has_previous': page_obj.has_previous(),
                 'num_pages': paginator.num_pages,
@@ -129,6 +125,8 @@ class LogoutView(View):
         response.delete_cookie('userLoggedIn')
         return response
 
+
+# Не треба
 # class ConvertView(object):
 #     @staticmethod
 #     def as_view(request):
