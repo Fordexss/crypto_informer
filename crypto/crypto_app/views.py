@@ -1,4 +1,3 @@
-from django.core.paginator import Paginator
 from django.core.serializers import json
 from django.http import JsonResponse
 from django.contrib.auth import logout, authenticate
@@ -10,37 +9,34 @@ from django.views.decorators.csrf import csrf_exempt
 import json
 import simplejson as json
 from django.views.generic import ListView, CreateView
+from rest_framework.generics import ListAPIView
+from rest_framework.pagination import PageNumberPagination
+from rest_framework.response import Response
+
 from .helpers import *
 from .forms import RegistrationForm
 from django.contrib.auth import login as auth_login
 from .models import CustomUser
+from .serializers import IndexSerializer
 
 
-class IndexApiView(ListView):
-    paginate_by = 20
+class CryptoPaginator(PageNumberPagination):
+    page_size = 20
 
-    def get(self, request, *args, **kwargs):
-        try:
-            top_crypto = get_top_crypto()
-            if top_crypto:
-                for crypto in top_crypto:
-                    crypto['name'] = f"{crypto['name']} ({crypto['symbol']})"
-            else:
-                top_crypto = []
+    def get_paginated_response(self, data):
+        return Response({
+            'current_page': self.page.number,
+            'num_pages': self.page.paginator.num_pages,
+            'has_next': self.page.has_next(),
+            'has_previous': self.page.has_previous(),
+            'top_crypto': data
+        })
 
-            paginator = Paginator(top_crypto, self.paginate_by)
-            page_number = request.GET.get('page', 1)
-            page_obj = paginator.get_page(page_number)
 
-            return JsonResponse({
-                'top_crypto': list(page_obj),
-                'has_next': page_obj.has_next(),
-                'has_previous': page_obj.has_previous(),
-                'num_pages': paginator.num_pages,
-                'current_page': page_obj.number,
-            })
-        except Exception as e:
-            return JsonResponse({'error': str(e)}, status=500)
+class IndexApiView(ListAPIView):
+    queryset = get_top_crypto()
+    serializer_class = IndexSerializer
+    pagination_class = CryptoPaginator
 
 
 class CryptoNewsApiView(View):
@@ -124,7 +120,6 @@ class LogoutView(View):
         response = JsonResponse({'message': 'Ви успішно вийшли з облікового запису'})
         response.delete_cookie('userLoggedIn')
         return response
-
 
 # Не треба
 # class ConvertView(object):
