@@ -8,29 +8,14 @@ from django.views import View
 from django.views.decorators.csrf import csrf_exempt
 import json
 import simplejson as json
-from django.views.generic import ListView, CreateView
+from django.views.generic import CreateView
 from rest_framework.generics import ListAPIView
-from rest_framework.pagination import PageNumberPagination
-from rest_framework.response import Response
-
 from .helpers import *
 from .forms import RegistrationForm
 from django.contrib.auth import login as auth_login
 from .models import CustomUser
+from .paginations import CryptoPaginator
 from .serializers import IndexSerializer
-
-
-class CryptoPaginator(PageNumberPagination):
-    page_size = 20
-
-    def get_paginated_response(self, data):
-        return Response({
-            'current_page': self.page.number,
-            'num_pages': self.page.paginator.num_pages,
-            'has_next': self.page.has_next(),
-            'has_previous': self.page.has_previous(),
-            'top_crypto': data
-        })
 
 
 class IndexApiView(ListAPIView):
