@@ -245,15 +245,6 @@ function Index() {
                 <Grid item xs={12} sm={6} md={4} lg={3} key={crypto.id} data-aos="fade-up">
                   <Card sx={{ bgcolor: 'background.paper', borderRadius: 2, boxShadow: 3 }}>
                     <CardHeader
-                      avatar={
-                        crypto.name === 'Bitcoin' ? (
-                          <FaBitcoin size={24} color="#f7931a" />
-                        ) : crypto.name === 'Ethereum' ? (
-                          <FaEthereum size={24} color="#3c3c3d" />
-                        ) : crypto.name === 'Ripple' ? (
-                          <SiRipple size={24} color="#346aa9" />
-                        ) : null
-                      }
                       title={`${(currentPage - 1) * 20 + index + 1}. ${crypto.name}`}
                       subheader={`$${parseFloat(crypto.quote.USD.price).toFixed(2)}`}
                     />
