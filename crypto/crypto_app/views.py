@@ -14,7 +14,7 @@ from .helpers import *
 from .forms import RegistrationForm
 from django.contrib.auth import login as auth_login
 from .models import CustomUser
-from .paginations import CryptoPaginator
+from .paginators import CryptoPaginator
 from .serializers import IndexSerializer
 
 
