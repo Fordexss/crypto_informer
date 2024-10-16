@@ -1,60 +1,60 @@
 from django import forms
-from .models import CustomUser
+# from .models import CustomUser
 
-
-class RegistrationForm(forms.ModelForm):
-    username = forms.CharField(
-        widget=forms.TextInput(attrs={'class': 'form-control'}),
-        min_length=4,
-    )
-    email = forms.EmailField(widget=forms.EmailInput(attrs={'class': 'form-control'}))
-    password = forms.CharField(
-        widget=forms.PasswordInput(attrs={'class': 'form-control'}),
-        min_length=8,
-    )
-    password2 = forms.CharField(
-        widget=forms.PasswordInput(attrs={'class': 'form-control'}),
-        label='Repeat password'
-    )
-
-    class Meta:
-        model = CustomUser
-        fields = ['username', 'email']
-        widgets = {
-            'username': forms.TextInput(attrs={'class': 'form-control'}),
-            'email': forms.EmailInput(attrs={'class': 'form-control'}),
-        }
-
-    def clean_password2(self):
-        cd = self.cleaned_data
-        if cd.get('password') != cd.get('password2'):
-            raise forms.ValidationError('Passwords are not equal')
-        return cd.get('password2')
-
-
-class LoginForm(forms.Form):
-    email = forms.EmailField(widget=forms.EmailInput(attrs={'class': 'form-control'}))
-    password = forms.CharField(widget=forms.PasswordInput(attrs={'class': 'form-control'}))
-
-    def clean(self):
-        cleaned_data = super().clean()
-        email = cleaned_data.get('email')
-        password = cleaned_data.get('password')
-
-        if email and password:
-            qs = CustomUser.objects.filter(email=email)
-            if not qs.exists():
-                raise forms.ValidationError('User does not exist')
-        return cleaned_data
-
-
-class ConverterForm(forms.Form):
-    from_crypto = forms.ChoiceField(label='From', choices=[])
-    to_crypto = forms.ChoiceField(label='In', choices=[])
-    amount = forms.FloatField(label='Quantity')
-
-    def __init__(self, *args, **kwargs):
-        super(ConverterForm, self).__init__(*args, **kwargs)
+# ні нада але не видаляй
+# class RegistrationForm(forms.ModelForm):
+#     username = forms.CharField(
+#         widget=forms.TextInput(attrs={'class': 'form-control'}),
+#         min_length=4,
+#     )
+#     email = forms.EmailField(widget=forms.EmailInput(attrs={'class': 'form-control'}))
+#     password = forms.CharField(
+#         widget=forms.PasswordInput(attrs={'class': 'form-control'}),
+#         min_length=8,
+#     )
+#     password2 = forms.CharField(
+#         widget=forms.PasswordInput(attrs={'class': 'form-control'}),
+#         label='Repeat password'
+#     )
+#
+#     class Meta:
+#         model = CustomUser
+#         fields = ['username', 'email']
+#         widgets = {
+#             'username': forms.TextInput(attrs={'class': 'form-control'}),
+#             'email': forms.EmailInput(attrs={'class': 'form-control'}),
+#         }
+#
+#     def clean_password2(self):
+#         cd = self.cleaned_data
+#         if cd.get('password') != cd.get('password2'):
+#             raise forms.ValidationError('Passwords are not equal')
+#         return cd.get('password2')
+#
+#
+# class LoginForm(forms.Form):
+#     email = forms.EmailField(widget=forms.EmailInput(attrs={'class': 'form-control'}))
+#     password = forms.CharField(widget=forms.PasswordInput(attrs={'class': 'form-control'}))
+#
+#     def clean(self):
+#         cleaned_data = super().clean()
+#         email = cleaned_data.get('email')
+#         password = cleaned_data.get('password')
+#
+#         if email and password:
+#             qs = CustomUser.objects.filter(email=email)
+#             if not qs.exists():
+#                 raise forms.ValidationError('User does not exist')
+#         return cleaned_data
+#
+#
+# class ConverterForm(forms.Form):
+#     from_crypto = forms.ChoiceField(label='From', choices=[])
+#     to_crypto = forms.ChoiceField(label='In', choices=[])
+#     amount = forms.FloatField(label='Quantity')
+#
+#     def __init__(self, *args, **kwargs):
+#         super(ConverterForm, self).__init__(*args, **kwargs)
 
 
 # Не треба
