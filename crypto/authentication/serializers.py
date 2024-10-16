@@ -14,17 +14,15 @@ class RegistrationSerializer(serializers.ModelSerializer):
     def validate(self, obj):
         if obj.get('password') != obj.get('confirm_password'):
             raise serializers.ValidationError("Бро, чєкни паролі, вони ж різні")
+        return obj
 
     def create(self, validated_data):
-        validated_data.pop('confirm password')
+        validated_data.pop('confirm_password')
 
         new_user = CustomUser.objects.create_user(
-            email = validated_data['email'],
-            username = validated_data['username'],
-            password = validated_data['password']
+            email=validated_data['email'],
+            username=validated_data['username'],
+            password=validated_data['password']
         )
         new_user.save()
         return new_user
-
-
-

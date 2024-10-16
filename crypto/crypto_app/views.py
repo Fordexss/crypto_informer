@@ -18,6 +18,7 @@ from .paginators import CryptoPaginator
 from .serializers import IndexSerializer
 from .helpers import get_top_crypto
 
+
 class IndexApiView(ListAPIView):
     queryset = get_top_crypto()
     serializer_class = IndexSerializer
@@ -30,7 +31,9 @@ class CryptoNewsApiView(View):
         news_f_temp = [{'title': article['title'], 'url': article['url']} for article in news] if news else []
         return JsonResponse({'news': news_f_temp})
 
-#Ні нада але не видаляй
+
+
+# Ні нада але не видаляй
 # @method_decorator(csrf_exempt, name='dispatch')
 # class RegistrationApiView(CreateView):
 #     form_class = RegistrationForm

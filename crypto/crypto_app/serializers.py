@@ -6,3 +6,4 @@ class IndexSerializer(serializers.Serializer):
     name = serializers.CharField()
     symbol = serializers.CharField()
     quote = serializers.DictField()
+
