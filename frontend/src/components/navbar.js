@@ -16,7 +16,7 @@ import MenuIcon from '@mui/icons-material/Menu';
 import AccountCircle from '@mui/icons-material/AccountCircle';
 
 const isUserLoggedIn = () => {
-  return document.cookie.split(';').some(cookie => cookie.trim().startsWith('userLoggedIn='));
+  return !!localStorage.getItem('accessToken');
 };
 
 function Navbar() {
@@ -26,17 +26,6 @@ function Navbar() {
   const isMobile = useMediaQuery(theme.breakpoints.down('md'));
   const navigate = useNavigate();
 
-  useEffect(() => {
-    const checkAuth = () => {
-      if (isUserLoggedIn()) {
-        navigate('/home');
-      }
-    };
-    window.addEventListener('load', checkAuth);
-    return () => {
-      window.removeEventListener('load', checkAuth);
-    };
-  }, [navigate]);
 
   const handleMenuOpen = (event) => {
     setAnchorEl(event.currentTarget);

@@ -28,12 +28,15 @@ const Profile = () => {
 
   const handleLogout = async () => {
     try {
-      document.cookie = 'userLoggedIn=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
+      // Удаляем токены из localStorage
+      localStorage.removeItem('accessToken');
+      localStorage.removeItem('refreshToken');
+
       Swal.fire('Успіх', 'Ви успішно вийшли з аккаунту!', 'success').then(() => {
         navigate('/home');
       });
     } catch (error) {
-      console.error('Error logging out:', error);
+      console.error('Ошибка при выходе:', error);
       Swal.fire('Помилка', 'Сталася помилка при виході з аккаунту.', 'error');
     }
   };

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import Swal from 'sweetalert2';
@@ -33,10 +33,6 @@ const getCSRFToken = () => {
   return cookieValue;
 };
 
-const isUserLoggedIn = () => {
-  return document.cookie.split(';').some(cookie => cookie.trim().startsWith('userLoggedIn='));
-};
-
 const Registration = () => {
   const [username, setUsername] = useState('');
   const [email, setEmail] = useState('');
@@ -47,6 +43,13 @@ const Registration = () => {
   const [showPassword2, setShowPassword2] = useState(false);
   const navigate = useNavigate();
 
+  useEffect(() => {
+    const token = localStorage.getItem('accessToken');
+    if (token) {
+      navigate('/profile');
+    }
+  }, [navigate]);
+
   const handlePasswordToggle = () => setShowPassword((prev) => !prev);
   const handlePassword2Toggle = () => setShowPassword2((prev) => !prev);
 
@@ -54,12 +57,12 @@ const Registration = () => {
     e.preventDefault();
 
     if (password !== password2) {
-      Swal.fire('Ошибка', 'Пароли не совпадают', 'error');
+      Swal.fire('Error', 'Passwords do not match', 'error');
       return;
     }
 
     if (!validatePassword(password)) {
-      Swal.fire('Ошибка', 'Пароль должен содержать не менее 8 символов, по крайней мере одну цифру и одну букву.', 'error');
+      Swal.fire('Error', 'Password must be at least 8 characters long and contain at least one number and one letter.', 'error');
       return;
     }
 
@@ -69,22 +72,22 @@ const Registration = () => {
     formData.append('username', username);
     formData.append('email', email);
     formData.append('password', password);
-    formData.append('password2', password2);
+    formData.append('confirm_password', password2);
 
     const csrfToken = getCSRFToken();
 
     try {
-      const response = await axios.post('http://localhost:8000/registration/', formData, {
+      const response = await axios.post('http://127.0.0.1:8000/api/auth/registration/', formData, {
         headers: {
           'X-CSRFToken': csrfToken,
           'Content-Type': 'application/x-www-form-urlencoded',
         },
       });
-      Swal.fire('Успіх', 'Реєстрація пройшла успішно!', 'success').then(() => {
+      Swal.fire('Success', 'Registration successful!', 'success').then(() => {
         navigate('/login');
       });
     } catch (error) {
-      Swal.fire('Ошибка', error.response.data.detail || 'Проверьте введенные данные.', 'error');
+      Swal.fire('Error', error.response.data.detail || 'Check the entered data.', 'error');
     } finally {
       setLoading(false);
     }
@@ -214,18 +217,18 @@ const Registration = () => {
                   size="large"
                   disabled={loading}
                 >
-                  {loading ? <CircularProgress size={24} color="inherit" /> : 'Зарегистрироваться'}
+                  {loading ? <CircularProgress size={24} color="inherit" /> : 'Register'}
                 </Button>
               </Grid>
               <Grid item xs={12}>
                 <Typography align="center">
-                  Вже є акаунт?{' '}
+                  Вже є акаунт?
                   <Button
                     color="secondary"
                     onClick={() => navigate('/login')}
                     size="small"
                   >
-                    Увійти
+                    Log In
                   </Button>
                 </Typography>
               </Grid>

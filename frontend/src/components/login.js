@@ -18,25 +18,6 @@ import {
 } from '@mui/material';
 import { Visibility, VisibilityOff } from '@mui/icons-material';
 
-const getCSRFToken = () => {
-  let cookieValue = null;
-  if (document.cookie && document.cookie !== '') {
-    const cookies = document.cookie.split(';');
-    for (let i = 0; i < cookies.length; i++) {
-      const cookie = cookies[i].trim();
-      if (cookie.substring(0, 10) === 'csrftoken=') {
-        cookieValue = decodeURIComponent(cookie.substring(10));
-        break;
-      }
-    }
-  }
-  return cookieValue;
-};
-
-const isUserLoggedIn = () => {
-  return document.cookie.split(';').some(cookie => cookie.trim().startsWith('userLoggedIn='));
-};
-
 const Login = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -45,53 +26,41 @@ const Login = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    if (isUserLoggedIn()) {
+    const token = localStorage.getItem('accessToken');
+    if (token) {
       navigate('/profile');
     }
   }, [navigate]);
 
   const handlePasswordToggle = () => setShowPassword((prev) => !prev);
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-
-    if (isUserLoggedIn()) {
-      Swal.fire('Ошибка', 'Ви вже в аккаунті. Спочатку вийдіть з нього.', 'error');
-      return;
-    }
-
     setLoading(true);
 
-    const csrfToken = getCSRFToken();
-
-    axios
-      .post(
-        'http://localhost:8000/login/',
+    try {
+      const response = await axios.post(
+        'http://127.0.0.1:8000/api/auth/token/',
         { email, password },
         {
           headers: {
-            'X-CSRFToken': csrfToken,
             'Content-Type': 'application/json',
           },
         }
-      )
-      .then((response) => {
-        console.log('Вхід успішний:', response.data);
+      );
 
-        const d = new Date();
-        d.setTime(d.getTime() + (1 * 24 * 60 * 60 * 3000));
-        let expires = "expires=" + d.toUTCString();
-        document.cookie = "userLoggedIn=true;" + expires + ";path=/";
+      localStorage.setItem('accessToken', response.data.access);
+      localStorage.setItem('refreshToken', response.data.refresh);
 
-        Swal.fire('Успіх', 'Вхід успішний!', 'success').then(() => {
-          navigate('/profile');
-        });
-      })
-      .catch((error) => {
-        console.error('Помилка при вході:', error.response.data);
-        Swal.fire('Помилка', error.response.data.detail || 'Перевірте введені дані.', 'error');
-      })
-      .finally(() => setLoading(false));
+      Swal.fire('Успех', 'Вход успешный!', 'success').then(() => {
+        navigate('/profile');
+      });
+    } catch (error) {
+      console.error('Ошибка при входе:', error.response.data);
+      Swal.fire('Ошибка', error.response.data.detail || 'Проверьте введенные данные.', 'error');
+    } finally {
+      setLoading(false);
+    }
   };
 
   const theme = createTheme({
@@ -187,13 +156,7 @@ const Login = () => {
                   Немає акаунту?{' '}
                   <Button
                     color="secondary"
-                    onClick={() => {
-                      if (isUserLoggedIn()) {
-                        Swal.fire('Помилка', 'Ви вже в аккаунті. Спочатку вийдіть з нього.', 'error');
-                      } else {
-                        navigate('/registration');
-                      }
-                    }}
+                    onClick={() => navigate('/registration')}
                     size="small"
                   >
                     Зареєструватися

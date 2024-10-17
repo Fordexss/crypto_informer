@@ -32,7 +32,6 @@ class CryptoNewsApiView(View):
         return JsonResponse({'news': news_f_temp})
 
 
-
 # Ні нада але не видаляй
 # @method_decorator(csrf_exempt, name='dispatch')
 # class RegistrationApiView(CreateView):
