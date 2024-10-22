@@ -4,12 +4,12 @@ import Navbar from './components/navbar';
 import CryptoConverter from './components/converter';
 import News from './components/news';
 import Profile from './components/profile';
-import { ThemeProvider } from './components/profile';
 import Login from './components/login';
 import Registration from './components/registration';
 import Index from './components/index';
 import CryptoGainersLosers from './components/gainers_and_losers';
 import CryptoTrending from './components/crypto_trending';
+import { ThemeProvider } from './components/theme_context'; // Only this import
 
 function App() {
   return (
@@ -19,7 +19,7 @@ function App() {
         <Routes>
           <Route path="/" element={<Navigate to="/home" replace />} />
           <Route path="/home" element={<Index />} />
-          <Route path="/converter/" element={<CryptoConverter />} />
+          <Route path="/converter" element={<CryptoConverter />} />
           <Route path="/news" element={<News />} />
           <Route path="/profile" element={<Profile />} />
           <Route path="/login" element={<Login />} />
@@ -33,4 +33,3 @@ function App() {
 }
 
 export default App;
-

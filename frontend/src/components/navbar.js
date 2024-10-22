@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import {
   AppBar,
@@ -14,6 +14,10 @@ import {
 } from '@mui/material';
 import MenuIcon from '@mui/icons-material/Menu';
 import AccountCircle from '@mui/icons-material/AccountCircle';
+import NewsIcon from '@mui/icons-material/Article';
+import TrendingUpIcon from '@mui/icons-material/TrendingUp';
+import ArrowUpwardIcon from '@mui/icons-material/ArrowUpward';
+import ArrowDownwardIcon from '@mui/icons-material/ArrowDownward';
 
 const isUserLoggedIn = () => {
   return !!localStorage.getItem('accessToken');
@@ -25,7 +29,6 @@ function Navbar() {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('md'));
   const navigate = useNavigate();
-
 
   const handleMenuOpen = (event) => {
     setAnchorEl(event.currentTarget);
@@ -70,25 +73,25 @@ function Navbar() {
               onClose={handleMenuClose}
             >
               <MenuItem component={Link} to="/news" onClick={handleMenuClose}>
-                Новини
+                <NewsIcon sx={{ mr: 1 }} /> News
               </MenuItem>
               <MenuItem component={Link} to="/gainers_and_losers" onClick={handleMenuClose}>
-                Ріст і падіння
+                <ArrowUpwardIcon sx={{ mr: 1 }} /> Gainers and losers
               </MenuItem>
               <MenuItem component={Link} to="/crypto_trending" onClick={handleMenuClose}>
-                Тренди
+                <TrendingUpIcon sx={{ mr: 1 }} /> Trends
               </MenuItem>
               {isAuthenticated ? (
                 <MenuItem component={Link} to="/profile" onClick={handleMenuClose}>
-                  Особистий кабінет
+                  <AccountCircle sx={{ mr: 1 }} /> Profile
                 </MenuItem>
               ) : (
                 <>
                   <MenuItem component={Link} to="/login" onClick={handleMenuClose}>
-                    Увійти
+                    <AccountCircle sx={{ mr: 1 }} /> Log in
                   </MenuItem>
                   <MenuItem component={Link} to="/registration" onClick={handleMenuClose}>
-                    Зареєструватися
+                    <AccountCircle sx={{ mr: 1 }} /> Registration
                   </MenuItem>
                 </>
               )}
@@ -97,13 +100,13 @@ function Navbar() {
         ) : (
           <Box sx={{ flexGrow: 1, display: 'flex', justifyContent: 'flex-end' }}>
             <Button component={Link} to="/news" sx={{ color: 'white', mx: 1 }}>
-              Новини
+              <NewsIcon sx={{ mr: 0.5 }} /> News
             </Button>
             <Button component={Link} to="/gainers_and_losers" sx={{ color: 'white', mx: 1 }}>
-              Ріст і падіння
+              <ArrowUpwardIcon sx={{ mr: 0.5 }} /> Gainers and losers
             </Button>
             <Button component={Link} to="/crypto_trending" sx={{ color: 'white', mx: 1 }}>
-              Тренди
+              <TrendingUpIcon sx={{ mr: 0.5 }} /> Trends
             </Button>
             {isAuthenticated ? (
               <IconButton component={Link} to="/profile" sx={{ color: 'white' }}>
@@ -112,10 +115,10 @@ function Navbar() {
             ) : (
               <>
                 <Button component={Link} to="/login" sx={{ color: 'white', mx: 1 }}>
-                  Увійти
+                  <AccountCircle sx={{ mr: 0.5 }} /> Log in
                 </Button>
                 <Button component={Link} to="/registration" sx={{ color: 'white', mx: 1 }}>
-                  Зареєструватися
+                  <AccountCircle sx={{ mr: 0.5 }} /> Registration
                 </Button>
               </>
             )}

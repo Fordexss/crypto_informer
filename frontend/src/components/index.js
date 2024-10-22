@@ -27,7 +27,7 @@ import { SiRipple } from 'react-icons/si';
 import { ClipLoader } from 'react-spinners';
 import AOS from 'aos';
 import 'aos/dist/aos.css';
-import { useTheme } from './profile';
+import { useTheme } from './theme_context'
 
 const lightTheme = createTheme({
   palette: {
