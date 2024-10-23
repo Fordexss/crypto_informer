@@ -1,7 +1,7 @@
 import React, { useState, createContext, useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { FormControlLabel, Switch, Typography, Box, Button, Paper, Divider } from '@mui/material';
-import { AccountCircle, Logout, CompareArrows } from '@mui/icons-material';
+import { AccountCircle, Logout, CompareArrows, CurrencyBitcoinOutlined } from '@mui/icons-material';
 import Swal from 'sweetalert2';
 
 const ThemeContext = createContext();
@@ -45,6 +45,10 @@ const Profile = () => {
     navigate('/converter');
   };
 
+  const handleTrackedCurrenciesClick = () => {
+    navigate('/tracked_currencies');
+  };
+
   return (
     <Box sx={{ padding: 4, display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '100vh' }}>
       <Paper elevation={3} sx={{ padding: 3, maxWidth: 500, width: '100%' }}>
@@ -68,6 +72,15 @@ const Profile = () => {
           sx={{ mt: 2, mb: 1, width: '100%' }}
         >
           Конвертер
+        </Button>
+        <Button
+          variant="contained"
+          color="primary"
+          onClick={handleTrackedCurrenciesClick}
+          startIcon={<CurrencyBitcoinOutlined />}
+          sx={{ mt: 2, mb: 1, width: '100%' }}
+        >
+          Відслідковувані Валюти
         </Button>
         <Button
           variant="outlined"
