@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { AccountCircle, Logout, CompareArrows, CurrencyBitcoinOutlined } from '@mui/icons-material';
 import {
   Avatar, Box, Button, Divider, FormControlLabel,
   Paper, Switch, Typography, useMediaQuery,
 } from '@mui/material';
-import { AccountCircle, Logout, CompareArrows } from '@mui/icons-material';
 import Swal from 'sweetalert2';
 import { useTheme } from './theme_context';
 import styled, { ThemeProvider } from 'styled-components';
@@ -68,6 +68,10 @@ const Profile = () => {
     navigate('/converter');
   };
 
+  const handleTrackedCurrenciesClick = () => {
+    navigate('/tracked_currencies');
+  };
+
   return (
     <ThemeProvider theme={isDarkMode ? { mode: 'dark' } : { mode: 'light' }}>
       <ProfileContainer>
@@ -104,6 +108,15 @@ const Profile = () => {
           >
             Converter
           </Button>
+        <Button
+          variant="contained"
+          color="primary"
+          onClick={handleTrackedCurrenciesClick}
+          startIcon={<CurrencyBitcoinOutlined />}
+          sx={{ mt: 2, mb: 1, width: '100%' }}
+        >
+          Відслідковувані Валюти
+        </Button>
           <Button
             variant="outlined"
             color="error"

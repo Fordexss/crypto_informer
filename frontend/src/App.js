@@ -9,6 +9,7 @@ import Registration from './components/registration';
 import Index from './components/index';
 import CryptoGainersLosers from './components/gainers_and_losers';
 import CryptoTrending from './components/crypto_trending';
+import TrackedCurrencies from './components/tracked_currencies'
 import { ThemeProvider } from './components/theme_context'; // Only this import
 
 function App() {
@@ -26,6 +27,7 @@ function App() {
           <Route path="/registration" element={<Registration />} />
           <Route path="/gainers_and_losers" element={<CryptoGainersLosers />} />
           <Route path="/crypto_trending" element={<CryptoTrending />} />
+          <Route path="/tracked_currencies" element={<TrackedCurrencies />} />
         </Routes>
       </Router>
     </ThemeProvider>
