@@ -1,13 +1,14 @@
-import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { AccountCircle, Logout, CompareArrows, CurrencyBitcoinOutlined } from '@mui/icons-material';
 import {
   Avatar, Box, Button, Divider, FormControlLabel,
   Paper, Switch, Typography, useMediaQuery,
 } from '@mui/material';
+import { AccountCircle, Logout, CompareArrows } from '@mui/icons-material';
 import Swal from 'sweetalert2';
 import { useTheme } from './theme_context';
 import styled, { ThemeProvider } from 'styled-components';
+import React, { useState, useEffect } from 'react';
+import { CurrencyBitcoinOutlined } from '@mui/icons-material';
+import { useNavigate } from 'react-router-dom';
 
 const ProfileContainer = styled(Box)`
   display: flex;

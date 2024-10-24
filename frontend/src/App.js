@@ -10,7 +10,7 @@ import Index from './components/index';
 import CryptoGainersLosers from './components/gainers_and_losers';
 import CryptoTrending from './components/crypto_trending';
 import TrackedCurrencies from './components/tracked_currencies'
-import { ThemeProvider } from './components/theme_context'; // Only this import
+import { ThemeProvider } from './components/theme_context';
 
 function App() {
   return (

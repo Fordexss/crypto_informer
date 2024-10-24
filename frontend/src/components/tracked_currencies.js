@@ -23,7 +23,7 @@ import { Refresh, Favorite, FavoriteBorder } from '@mui/icons-material';
 import { ClipLoader } from 'react-spinners';
 import AOS from 'aos';
 import 'aos/dist/aos.css';
-import { useTheme } from './profile';
+import { useTheme } from './theme_context';
 
 const lightTheme = createTheme({
   palette: {
@@ -118,7 +118,7 @@ const darkTheme = createTheme({
 function TrackedCurrencies() {
   const { isDarkMode } = useTheme();
   const [topCrypto, setTopCrypto] = useState([]);
-  const [trackedCurrencies, setTrackedCurrencies] = useState([]); // Список відстежуваних валют
+  const [trackedCurrencies, setTrackedCurrencies] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [isLoading, setIsLoading] = useState(true);
