@@ -1,11 +1,65 @@
 import React, { useEffect, useState, useRef } from 'react';
 import Chart from 'chart.js/auto';
-import './crypto_trending.css';
+import styled from 'styled-components';
+import { useTheme } from './theme_context';
 
 const apiKey = process.env.REACT_APP_CG_API_KEY;
 
+const CryptoTrendingContainer = styled.div`
+  background-color: ${({ theme }) => (theme === 'dark' ? '#2c2c2c' : '#f5f5f5')};
+  padding: 20px;
+  border-radius: 8px;
+  color: ${({ theme }) => (theme === 'dark' ? 'white' : 'black')};
+`;
+
+const CryptoItemContainer = styled.div`
+  background-color: ${({ theme }) => (theme === 'dark' ? '#1e1e1e' : '#fff')};
+  color: ${({ theme }) => (theme === 'dark' ? '#fff' : '#333')};
+  border: 1px solid ${({ theme }) => (theme === 'dark' ? '#333' : '#ccc')};
+  padding: 1rem;
+  margin-bottom: 1rem;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+
+  .crypto-info {
+    display: flex;
+    align-items: center;
+    margin-bottom: 0.5rem;
+
+    img {
+      width: 32px;
+      height: 32px;
+      margin-right: 0.5rem;
+    }
+
+    .crypto-name {
+      font-weight: bold;
+    }
+
+    .crypto-symbol {
+      color: #777;
+      font-size: 0.9rem;
+    }
+  }
+
+  .crypto-stats {
+    div {
+      margin-bottom: 0.25rem;
+    }
+  }
+
+  .crypto-chart {
+    height: 100px;
+    margin-top: 0.5rem;
+    canvas {
+      height: 100%;
+    }
+  }
+`;
+
 const CryptoItem = ({ coin }) => {
   const chartRef = useRef(null);
+  const { isDarkMode } = useTheme();
 
   useEffect(() => {
     const fetchChartData = async () => {
@@ -25,7 +79,8 @@ const CryptoItem = ({ coin }) => {
               datasets: [{
                 label: 'Price (7d)',
                 data: prices,
-                borderColor: '#4CAF50',
+                borderColor: isDarkMode ? '#4CAF50' : '#007bff',
+                backgroundColor: isDarkMode ? 'rgba(76, 175, 80, 0.2)' : 'rgba(0, 123, 255, 0.2)',
                 fill: false,
                 borderWidth: 2
               }]
@@ -35,7 +90,15 @@ const CryptoItem = ({ coin }) => {
               maintainAspectRatio: false,
               scales: {
                 x: { display: false },
-                y: { display: false }
+                y: {
+                  display: false,
+                  ticks: {
+                    color: isDarkMode ? '#fff' : '#333',
+                  },
+                  grid: {
+                    color: isDarkMode ? '#333' : '#ccc',
+                  },
+                }
               },
               elements: {
                 point: { radius: 0 }
@@ -47,15 +110,15 @@ const CryptoItem = ({ coin }) => {
           });
         }
       } catch (error) {
-        console.error('Ошибка при получении данных графика:', error);
+        console.error('Error fetching chart data:', error);
       }
     };
 
     fetchChartData();
-  }, [coin.id]);
+  }, [coin.id, isDarkMode]);
 
   return (
-    <div className="crypto-item">
+    <CryptoItemContainer theme={isDarkMode ? 'dark' : 'light'}>
       <div className="crypto-info">
         <img src={coin.image} alt={coin.name} />
         <div>
@@ -72,12 +135,13 @@ const CryptoItem = ({ coin }) => {
       <div className="crypto-chart">
         <canvas ref={chartRef} />
       </div>
-    </div>
+    </CryptoItemContainer>
   );
 };
 
 const CryptoTrending = () => {
   const [trending, setTrending] = useState([]);
+  const { isDarkMode } = useTheme();
 
   useEffect(() => {
     const fetchTrendingData = async () => {
@@ -95,12 +159,12 @@ const CryptoTrending = () => {
   }, []);
 
   return (
-    <div>
+    <CryptoTrendingContainer theme={isDarkMode ? 'dark' : 'light'}>
       <h1>Тренд топ 10 криптовалют</h1>
       <div id="trendingContainer">
         {trending.map(coin => <CryptoItem key={coin.id} coin={coin} />)}
       </div>
-    </div>
+    </CryptoTrendingContainer>
   );
 };
 
