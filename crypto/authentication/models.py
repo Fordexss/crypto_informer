@@ -1,3 +1,4 @@
+import uuid
 from django.db import models
 from django.contrib.auth.base_user import AbstractBaseUser, BaseUserManager
 from django.contrib.auth.models import PermissionsMixin
@@ -23,9 +24,10 @@ class CustomUserManager(BaseUserManager):
 class CustomUser(AbstractBaseUser, PermissionsMixin):
     username = models.CharField(max_length=20)
     email = models.EmailField(unique=True)
-    is_active = models.BooleanField(default=True)
+    is_active = models.BooleanField(default=False)
     is_staff = models.BooleanField(default=False)
     is_superuser = models.BooleanField(default=False)
+    is_verified = models.BooleanField(default=False)
 
     USERNAME_FIELD = 'email'
     EMAIL_FIELD = 'email'
@@ -34,4 +36,14 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
     objects = CustomUserManager()
 
     def __str__(self) -> str:
+        return self.email
+
+
+class UnverifiedUser(models.Model):
+    username = models.CharField(max_length=20)
+    email = models.EmailField(unique=True)
+    password = models.CharField(max_length=128)
+    verification_token = models.UUIDField(default=uuid.uuid4, editable=False)
+
+    def __str__(self):
         return self.email

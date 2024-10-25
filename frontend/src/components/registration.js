@@ -68,26 +68,18 @@ const Registration = () => {
 
     setLoading(true);
 
-    const formData = new URLSearchParams();
-    formData.append('username', username);
-    formData.append('email', email);
-    formData.append('password', password);
-    formData.append('confirm_password', password2);
-
-    const csrfToken = getCSRFToken();
-
     try {
-      const response = await axios.post('http://127.0.0.1:8000/api/auth/registration/', formData, {
+      const response = await axios.post('http://127.0.0.1:8000/api/auth/registration/',
+      {username, email, password, confirm_password: password2},
+      {
         headers: {
-          'X-CSRFToken': csrfToken,
-          'Content-Type': 'application/x-www-form-urlencoded',
+          'X-CSRFToken': getCSRFToken(),
         },
       });
-      Swal.fire('Success', 'Registration successful!', 'success').then(() => {
-        navigate('/login');
-      });
+      console.log(response.data)
+      Swal.fire('Registration Successful', 'Please check your email to activate your account.', 'success');
     } catch (error) {
-      Swal.fire('Error', error.response.data.detail || 'Check the entered data.', 'error');
+      Swal.fire('Error', error.response?.data?.detail || 'Registration failed. Please check the entered data.', 'error');
     } finally {
       setLoading(false);
     }
@@ -222,7 +214,7 @@ const Registration = () => {
               </Grid>
               <Grid item xs={12}>
                 <Typography align="center">
-                  Вже є акаунт?
+                  Already have an account?
                   <Button
                     color="secondary"
                     onClick={() => navigate('/login')}
