@@ -1,6 +1,8 @@
 from rest_framework import serializers
-
-from .models import CustomUser
+from .models import CustomUser, UnverifiedUser
+from django.core.mail import send_mail
+from django.conf import settings
+import re
 
 
 class RegistrationSerializer(serializers.ModelSerializer):
@@ -13,16 +15,37 @@ class RegistrationSerializer(serializers.ModelSerializer):
 
     def validate(self, obj):
         if obj.get('password') != obj.get('confirm_password'):
-            raise serializers.ValidationError("Бро, чєкни паролі, вони ж різні")
+            raise serializers.ValidationError("Passwords do not match.")
         return obj
 
+    def validate_password(self, password):
+        if len(password) < 8:
+            raise serializers.ValidationError("Password must be at least 8 characters long.")
+        if not re.search(r"\d", password):
+            raise serializers.ValidationError("Password must contain at least one number.")
+        if not re.search(r"[a-zA-Z]", password):
+            raise serializers.ValidationError("Password must contain at least one letter.")
+        return password
+
     def create(self, validated_data):
+        password = validated_data.pop('password')
         validated_data.pop('confirm_password')
 
-        new_user = CustomUser.objects.create_user(
-            email=validated_data['email'],
+        new_unverified = UnverifiedUser(
             username=validated_data['username'],
-            password=validated_data['password']
+            email=validated_data['email'],
+            password=password
         )
-        new_user.save()
-        return new_user
+        new_unverified.save()
+
+        activation_link = f"{settings.FRONTEND_URL}/activate/{new_unverified.verification_token}"
+
+        send_mail(
+            'Confirm Registration',
+            f'To activate your account, please click on this link: {activation_link}',
+            settings.EMAIL_HOST_USER,
+            [validated_data['email']],
+            fail_silently=False,
+        )
+
+        return new_unverified

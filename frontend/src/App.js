@@ -11,6 +11,7 @@ import CryptoGainersLosers from './components/gainers_and_losers';
 import CryptoTrending from './components/crypto_trending';
 import TrackedCurrencies from './components/tracked_currencies'
 import { ThemeProvider } from './components/theme_context';
+import Activation from './components/activation'
 
 function App() {
   return (
@@ -28,6 +29,7 @@ function App() {
           <Route path="/gainers_and_losers" element={<CryptoGainersLosers />} />
           <Route path="/crypto_trending" element={<CryptoTrending />} />
           <Route path="/tracked_currencies" element={<TrackedCurrencies />} />
+          <Route path="/activate/:token" element={<Activation />} />
         </Routes>
       </Router>
     </ThemeProvider>
