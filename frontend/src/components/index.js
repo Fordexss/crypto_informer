@@ -18,16 +18,12 @@ import {
   IconButton,
   CircularProgress,
   Tooltip,
-  Switch,
-  FormControlLabel,
 } from '@mui/material';
-import { ArrowUpward, ArrowDownward, Refresh } from '@mui/icons-material';
-import { FaBitcoin, FaEthereum } from 'react-icons/fa';
-import { SiRipple } from 'react-icons/si';
+import { ArrowUpward, ArrowDownward, Refresh, FavoriteBorder, Favorite } from '@mui/icons-material';
 import { ClipLoader } from 'react-spinners';
 import AOS from 'aos';
 import 'aos/dist/aos.css';
-import { useTheme } from './theme_context'
+import { useTheme } from './theme_context';
 
 const lightTheme = createTheme({
   palette: {
@@ -44,38 +40,6 @@ const lightTheme = createTheme({
     },
     text: {
       primary: '#000000',
-    },
-  },
-  typography: {
-    fontFamily: 'Roboto, Arial, sans-serif',
-    h4: {
-      fontWeight: 700,
-    },
-    h6: {
-      fontWeight: 500,
-    },
-    body2: {
-      color: '#333333',
-    },
-  },
-  components: {
-    MuiCard: {
-      styleOverrides: {
-        root: {
-          transition: 'transform 0.3s, box-shadow 0.3s',
-          '&:hover': {
-            transform: 'scale(1.05)',
-            boxShadow: '0 4px 20px rgba(0, 0, 0, 0.3)',
-          },
-        },
-      },
-    },
-    MuiTableCell: {
-      styleOverrides: {
-        root: {
-          color: 'black',
-        },
-      },
     },
   },
 });
@@ -97,40 +61,6 @@ const darkTheme = createTheme({
       primary: '#ffffff',
     },
   },
-  typography: {
-    fontFamily: 'Roboto, Arial, sans-serif',
-    h4: {
-      fontWeight: 700,
-      color: '#ffffff',
-    },
-    h6: {
-      fontWeight: 500,
-      color: '#cccccc',
-    },
-    body2: {
-      color: '#aaaaaa',
-    },
-  },
-  components: {
-    MuiCard: {
-      styleOverrides: {
-        root: {
-          transition: 'transform 0.3s, box-shadow 0.3s',
-          '&:hover': {
-            transform: 'scale(1.05)',
-            boxShadow: '0 4px 20px rgba(0, 0, 0, 0.3)',
-          },
-        },
-      },
-    },
-    MuiTableCell: {
-      styleOverrides: {
-        root: {
-          color: 'white',
-        },
-      },
-    },
-  },
 });
 
 function Index() {
@@ -140,6 +70,7 @@ function Index() {
   const [totalPages, setTotalPages] = useState(1);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [userData, setUserData] = useState(null);
   const [secondsLeft, setSecondsLeft] = useState(35);
 
   const fetchData = async () => {
@@ -160,9 +91,76 @@ function Index() {
     }
   };
 
+  const handleTrackClick = async (currencyId) => {
+    const token = localStorage.getItem('accessToken');
+    if (!token) {
+      setError('No access token found. Please log in.');
+      return;
+    };
+
+    const data = {
+      "currency_id": currencyId
+    };
+
+    try {
+      await axios.post('http://127.0.0.1:8000/api/index/', data, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      fetchUserData();
+    } catch (error) {
+      setError('Failed to track currency. Please try again.');
+    }
+  };
+
+  const handleDeleteTrackClick = async (cryptoId) => {
+    const token = localStorage.getItem("accessToken");
+    if (!token) {
+      setError('No access token found. Please log in.');
+      return;
+    };
+
+    try {
+      await axios.delete(`http://127.0.0.1:8000/api/tracked-currencies/${cryptoId}/`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      fetchUserData();
+    } catch (error) {
+      setError('Failed to delete tracked currency. Please try again.');
+    }
+  };
+
+  const UserTrackedCurrencies = async () => {
+    const token = localStorage.getItem('accessToken');
+
+    try {
+      const response = await axios.get('http://127.0.0.1:8000/api/tracked-currencies-help/', {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      setUserData(response.data);
+      return response.data;
+    } catch (error) {
+      console.error('Error fetching user:', error);
+      return null;
+    }
+  };
+
+  const fetchUserData = async () => {
+    const data = await UserTrackedCurrencies();
+    if (data) {
+      console.log("Fetched user data:", data);
+    }
+  };
+
   useEffect(() => {
     AOS.init({ duration: 1000 });
     fetchData();
+    fetchUserData();
 
     const intervalId = setInterval(() => {
       fetchData();
@@ -247,6 +245,17 @@ function Index() {
                     <CardHeader
                       title={`${(currentPage - 1) * 20 + index + 1}. ${crypto.name}`}
                       subheader={`$${parseFloat(crypto.quote.USD.price).toFixed(2)}`}
+                      action={
+                        userData?.some(currency => currency.id === crypto.id) ? (
+                          <IconButton onClick={() => handleDeleteTrackClick(crypto.id)}>
+                            <Favorite />
+                          </IconButton>
+                        ) : (
+                          <IconButton onClick={() => handleTrackClick(crypto.id)}>
+                            <FavoriteBorder />
+                          </IconButton>
+                        )
+                      }
                     />
                     <CardContent>
                       <Typography
@@ -270,22 +279,19 @@ function Index() {
                         {crypto.quote.USD.percent_change_7d < 0 ? <ArrowDownward /> : <ArrowUpward />}
                         {parseFloat(crypto.quote.USD.percent_change_7d).toFixed(2)}% (7d)
                       </Typography>
-                      <Typography variant="body2">
-                        Market Cap: ${parseFloat(crypto.quote.USD.market_cap).toFixed(2)}
-                      </Typography>
                     </CardContent>
                   </Card>
                 </Grid>
               ))}
             </Grid>
-            <Box display="flex" justifyContent="center" my={4}>
-              <Pagination
-                count={totalPages}
-                page={currentPage}
-                onChange={handlePageChange}
-                color="primary"
-              />
-            </Box>
+            <Pagination
+              count={totalPages}
+              page={currentPage}
+              onChange={handlePageChange}
+              color="primary"
+              variant="outlined"
+              shape="rounded"
+            />
           </>
         )}
       </Container>
