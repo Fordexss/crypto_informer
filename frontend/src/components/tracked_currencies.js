@@ -19,7 +19,7 @@ import {
   CircularProgress,
   Tooltip,
 } from '@mui/material';
-import { Refresh, Favorite, FavoriteBorder } from '@mui/icons-material';
+import { ArrowUpward, ArrowDownward, Refresh, Favorite } from '@mui/icons-material';
 import { ClipLoader } from 'react-spinners';
 import AOS from 'aos';
 import 'aos/dist/aos.css';
@@ -42,31 +42,6 @@ const lightTheme = createTheme({
       primary: '#000000',
     },
   },
-  typography: {
-    fontFamily: 'Roboto, Arial, sans-serif',
-    h4: {
-      fontWeight: 700,
-    },
-    h6: {
-      fontWeight: 500,
-    },
-    body2: {
-      color: '#333333',
-    },
-  },
-  components: {
-    MuiCard: {
-      styleOverrides: {
-        root: {
-          transition: 'transform 0.3s, box-shadow 0.3s',
-          '&:hover': {
-            transform: 'scale(1.05)',
-            boxShadow: '0 4px 20px rgba(0, 0, 0, 0.3)',
-          },
-        },
-      },
-    },
-  },
 });
 
 const darkTheme = createTheme({
@@ -86,55 +61,24 @@ const darkTheme = createTheme({
       primary: '#ffffff',
     },
   },
-  typography: {
-    fontFamily: 'Roboto, Arial, sans-serif',
-    h4: {
-      fontWeight: 700,
-      color: '#ffffff',
-    },
-    h6: {
-      fontWeight: 500,
-      color: '#cccccc',
-    },
-    body2: {
-      color: '#aaaaaa',
-    },
-  },
-  components: {
-    MuiCard: {
-      styleOverrides: {
-        root: {
-          transition: 'transform 0.3s, box-shadow 0.3s',
-          '&:hover': {
-            transform: 'scale(1.05)',
-            boxShadow: '0 4px 20px rgba(0, 0, 0, 0.3)',
-          },
-        },
-      },
-    },
-  },
 });
 
-function TrackedCurrencies() {
+function Index() {
   const { isDarkMode } = useTheme();
   const [topCrypto, setTopCrypto] = useState([]);
-  const [trackedCurrencies, setTrackedCurrencies] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [secondsLeft, setSecondsLeft] = useState(35);
 
-  const fetchData = async () => {
+  const fetchData = async (page = 1) => {
     setIsLoading(true);
     setError(null);
-    const token = localStorage.getItem('accessToken');
-    if (!token) {
-      setError('No access token found. Please log in.');
-      setIsLoading(false);
-      return;
-    }
+    const token = localStorage.getItem("accessToken");
+
     try {
-      const response = await axios.get(`http://localhost:8000/api/tracked-currencies/?page=${currentPage}`, {
+      const response = await axios.get(`http://localhost:8000/api/tracked-currencies/?page=${page}`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -146,43 +90,52 @@ function TrackedCurrencies() {
         setError('Unexpected data format');
       }
     } catch (error) {
-      console.error('Error fetching data:', error.response ? error.response.data : error.message);
-      setError('Failed to fetch data: ' + (error.response ? error.response.data.detail : error.message));
+      setError('Failed to fetch data: ' + error.message);
     } finally {
       setIsLoading(false);
     }
   };
 
-  const toggleTrackedCurrency = async (id) => {
+  const handleDeleteTrackClick = async (cryptoId) => {
+    const token = localStorage.getItem("accessToken");
+    if (!token) {
+      setError('No access token found. Please log in.');
+      return;
+    };
+
     try {
-      const token = localStorage.getItem('accessToken');
-      if (!token) {
-        setError('No access token found. Please log in.');
-        return;
-      }
-      if (trackedCurrencies.includes(id)) {
-        await axios.delete(`http://localhost:8000/api/tracked-currencies/${id}/`, {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        });
-        setTrackedCurrencies(trackedCurrencies.filter((currencyId) => currencyId !== id));
-      } else {
-        // Add currency tracking logic here if needed
-      }
+      await axios.delete(`http://127.0.0.1:8000/api/tracked-currencies/${cryptoId}/`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      fetchData(currentPage); // Fetch current page data after deletion
     } catch (error) {
-      console.error('Error toggling tracked currency:', error);
-      setError('Failed to toggle tracked currency: ' + error.message);
+      setError('Failed to delete tracked currency. Please try again.');
     }
   };
 
   useEffect(() => {
     AOS.init({ duration: 1000 });
-    fetchData();
-  }, [currentPage]);
+    fetchData(currentPage); // Fetch data for the current page
+
+    const intervalId = setInterval(() => {
+      fetchData(currentPage); // Refresh data every 35 seconds for current page
+      setSecondsLeft(35);
+    }, 35000);
+
+    const countdownInterval = setInterval(() => {
+      setSecondsLeft((prev) => (prev === 1 ? 35 : prev - 1));
+    }, 1000);
+
+    return () => {
+      clearInterval(intervalId);
+      clearInterval(countdownInterval);
+    };
+  }, [currentPage]); // Re-run effect when currentPage changes
 
   const handlePageChange = (event, value) => {
-    setCurrentPage(value);
+    setCurrentPage(value); // Set current page and trigger data fetch
   };
 
   return (
@@ -194,16 +147,43 @@ function TrackedCurrencies() {
             Crypto Prices
           </Typography>
           <Tooltip title="Refresh Data">
-            <IconButton color="inherit" onClick={fetchData}>
+            <IconButton color="inherit" onClick={() => fetchData(currentPage)}>
               <Refresh />
             </IconButton>
           </Tooltip>
         </Toolbar>
       </AppBar>
-
+      <Box display="flex" justifyContent="center" alignItems="center" my={2}>
+        <Box position="relative" display="inline-flex">
+          <CircularProgress
+            variant="determinate"
+            value={((35 - secondsLeft) / 35) * 100}
+            size={60}
+            thickness={5}
+            color="secondary"
+          />
+          <Box
+            top={0}
+            left={0}
+            bottom={0}
+            right={0}
+            position="absolute"
+            display="flex"
+            alignItems="center"
+            justifyContent="center"
+          >
+            <Typography variant="caption" component="div" color="textSecondary">
+              {secondsLeft}s
+            </Typography>
+          </Box>
+        </Box>
+      </Box>
       <Container>
         <Typography variant="h4" component="h1" gutterBottom sx={{ mt: 4 }}>
           Today's Cryptocurrency Prices by Market Cap
+        </Typography>
+        <Typography variant="h6" component="h2" gutterBottom>
+          Top 100 Cryptocurrencies:
         </Typography>
         {isLoading ? (
           <Box display="flex" justifyContent="center" my={4}>
@@ -214,44 +194,60 @@ function TrackedCurrencies() {
         ) : topCrypto.length === 0 ? (
           <Typography variant="body1">No data available</Typography>
         ) : (
-          <Grid container spacing={4} sx={{ my: 4 }}>
-            {topCrypto.map((crypto) => (
-              <Grid item xs={12} sm={6} md={4} lg={3} key={crypto.id} data-aos="fade-up">
-                <Card sx={{ bgcolor: 'background.paper', borderRadius: 2, boxShadow: 3 }}>
-                  <CardHeader
-                    title={crypto.name}
-                    subheader={`$${parseFloat(crypto.quote.USD.price).toFixed(2)}`}
-                    action={
-                      <IconButton
-                        onClick={() => toggleTrackedCurrency(crypto.id)}
-                        color={trackedCurrencies.includes(crypto.id) ? 'secondary' : 'default'}
+          <>
+            <Grid container spacing={4} sx={{ my: 4 }}>
+              {topCrypto.map((crypto, index) => (
+                <Grid item xs={12} sm={6} md={4} lg={3} key={crypto.id} data-aos="fade-up">
+                  <Card sx={{ bgcolor: 'background.paper', borderRadius: 2, boxShadow: 3 }}>
+                    <CardHeader
+                      title={`${(currentPage - 1) * 20 + index + 1}. ${crypto.name}`}
+                      subheader={`$${parseFloat(crypto.quote.USD.price).toFixed(2)}`}
+                      action={
+                        <IconButton onClick={() => handleDeleteTrackClick(crypto.id)}>
+                          <Favorite />
+                        </IconButton>
+                      }
+                    />
+                    <CardContent>
+                      <Typography
+                        variant="body2"
+                        sx={{ color: crypto.quote.USD.percent_change_1h < 0 ? 'red' : 'green' }}
                       >
-                        {trackedCurrencies.includes(crypto.id) ? <Favorite /> : <FavoriteBorder />}
-                        {console.log("ds", crypto.id)}
-                      </IconButton>
-                    }
-                  />
-                  <CardContent>
-                    <Typography variant="body2">
-                      Market Cap: ${parseFloat(crypto.quote.USD.market_cap).toFixed(2)}
-                    </Typography>
-                  </CardContent>
-                </Card>
-              </Grid>
-            ))}
-          </Grid>
+                        {crypto.quote.USD.percent_change_1h < 0 ? <ArrowDownward /> : <ArrowUpward />}
+                        {parseFloat(crypto.quote.USD.percent_change_1h).toFixed(2)}% (1h)
+                      </Typography>
+                      <Typography
+                        variant="body2"
+                        sx={{ color: crypto.quote.USD.percent_change_24h < 0 ? 'red' : 'green' }}
+                      >
+                        {crypto.quote.USD.percent_change_24h < 0 ? <ArrowDownward /> : <ArrowUpward />}
+                        {parseFloat(crypto.quote.USD.percent_change_24h).toFixed(2)}% (24h)
+                      </Typography>
+                      <Typography
+                        variant="body2"
+                        sx={{ color: crypto.quote.USD.percent_change_7d < 0 ? 'red' : 'green' }}
+                      >
+                        {crypto.quote.USD.percent_change_7d < 0 ? <ArrowDownward /> : <ArrowUpward />}
+                        {parseFloat(crypto.quote.USD.percent_change_7d).toFixed(2)}% (7d)
+                      </Typography>
+                    </CardContent>
+                  </Card>
+                </Grid>
+              ))}
+            </Grid>
+            <Pagination
+              count={totalPages}
+              page={currentPage}
+              onChange={handlePageChange}
+              color="primary"
+              variant="outlined"
+              shape="rounded"
+            />
+          </>
         )}
-        <Box display="flex" justifyContent="center" my={4}>
-          <Pagination
-            count={totalPages}
-            page={currentPage}
-            onChange={handlePageChange}
-            color="primary"
-          />
-        </Box>
       </Container>
     </ThemeProvider>
   );
 }
 
-export default TrackedCurrencies;
+export default Index;

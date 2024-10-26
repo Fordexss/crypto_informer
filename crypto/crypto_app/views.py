@@ -30,7 +30,7 @@ class IndexApiView(ListCreateAPIView):
 class TrackedCurrencyList(ListAPIView):
     serializer_class = IndexSerializer
     permission_classes = (IsAuthenticated, )
-    pagination_class = CryptoPaginator
+    pagination_class = None
 
     def get_queryset(self):
         tracked_currencies = TrackedCurrency.objects.filter(user=self.request.user)
