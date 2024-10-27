@@ -9,7 +9,6 @@ class RegistrationView(generics.CreateAPIView):
     permission_classes = []
 
 
-# views.py
 class ActivateAccountView(generics.RetrieveUpdateAPIView):
     queryset = CustomUser.objects.all()
     serializer_class = RegistrationSerializer
