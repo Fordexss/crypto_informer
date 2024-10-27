@@ -1,8 +1,7 @@
 from rest_framework import serializers
-from .models import CustomUser, UnverifiedUser
+from .models import CustomUser
 from django.core.mail import send_mail
 from django.conf import settings
-import re
 
 
 class RegistrationSerializer(serializers.ModelSerializer):
@@ -11,34 +10,22 @@ class RegistrationSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = CustomUser
-        fields = ["username", "email", "password", "confirm_password"]
+        fields = ["username", "email", "password", "confirm_password", "is_active"]
+        read_only_fields = ['is_active']
 
     def validate(self, obj):
         if obj.get('password') != obj.get('confirm_password'):
             raise serializers.ValidationError("Passwords do not match.")
         return obj
 
-    def validate_password(self, password):
-        if len(password) < 8:
-            raise serializers.ValidationError("Password must be at least 8 characters long.")
-        if not re.search(r"\d", password):
-            raise serializers.ValidationError("Password must contain at least one number.")
-        if not re.search(r"[a-zA-Z]", password):
-            raise serializers.ValidationError("Password must contain at least one letter.")
-        return password
-
     def create(self, validated_data):
         password = validated_data.pop('password')
         validated_data.pop('confirm_password')
+        user = CustomUser(**validated_data)
+        user.set_password(password)
+        user.save()
 
-        new_unverified = UnverifiedUser(
-            username=validated_data['username'],
-            email=validated_data['email'],
-            password=password
-        )
-        new_unverified.save()
-
-        activation_link = f"{settings.FRONTEND_URL}/activate/{new_unverified.verification_token}"
+        activation_link = f"{settings.FRONTEND_URL}/activate/{user.verification_token}"
 
         send_mail(
             'Confirm Registration',
@@ -48,4 +35,4 @@ class RegistrationSerializer(serializers.ModelSerializer):
             fail_silently=False,
         )
 
-        return new_unverified
+        return user

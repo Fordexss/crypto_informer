@@ -84,6 +84,11 @@ function Index() {
         },
       });
       if (response.data && response.data.top_crypto) {
+        if (response.data.top_crypto.length === 0 && page !== 1) {
+          setCurrentPage(1);
+          fetchData(1);
+          return;
+        }
         setTopCrypto(response.data.top_crypto);
         setTotalPages(response.data.num_pages);
       } else {
@@ -109,18 +114,29 @@ function Index() {
           Authorization: `Bearer ${token}`,
         },
       });
-      fetchData(currentPage); // Fetch current page data after deletion
+      const response = await axios.get(`http://localhost:8000/api/tracked-currencies/?page=${currentPage}`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      if (response.data.top_crypto.length === 0 && currentPage !== 1) {
+        setCurrentPage(1);
+        fetchData(1);
+      } else {
+        fetchData(currentPage);
+      }
     } catch (error) {
-      setError('Failed to delete tracked currency. Please try again.');
+      setError('На цій сторінці нема криптовалют');
     }
   };
 
   useEffect(() => {
     AOS.init({ duration: 1000 });
-    fetchData(currentPage); // Fetch data for the current page
+    fetchData(currentPage);
 
     const intervalId = setInterval(() => {
-      fetchData(currentPage); // Refresh data every 35 seconds for current page
+      fetchData(currentPage);
       setSecondsLeft(35);
     }, 35000);
 
@@ -132,10 +148,10 @@ function Index() {
       clearInterval(intervalId);
       clearInterval(countdownInterval);
     };
-  }, [currentPage]); // Re-run effect when currentPage changes
+  }, [currentPage]);
 
   const handlePageChange = (event, value) => {
-    setCurrentPage(value); // Set current page and trigger data fetch
+    setCurrentPage(value);
   };
 
   return (
@@ -192,7 +208,9 @@ function Index() {
         ) : error ? (
           <Alert severity="error">{error}</Alert>
         ) : topCrypto.length === 0 ? (
-          <Typography variant="body1">No data available</Typography>
+          <Alert severity="info" sx={{ my: 4 }}>
+            Ви поки не додали криптовалюти
+          </Alert>
         ) : (
           <>
             <Grid container spacing={4} sx={{ my: 4 }}>
@@ -235,14 +253,16 @@ function Index() {
                 </Grid>
               ))}
             </Grid>
-            <Pagination
-              count={totalPages}
-              page={currentPage}
-              onChange={handlePageChange}
-              color="primary"
-              variant="outlined"
-              shape="rounded"
-            />
+            {totalPages > 1 && (
+              <Pagination
+                count={totalPages}
+                page={currentPage}
+                onChange={handlePageChange}
+                color="primary"
+                variant="outlined"
+                shape="rounded"
+              />
+            )}
           </>
         )}
       </Container>

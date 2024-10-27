@@ -16,6 +16,7 @@ from .serializers import (
 from .helpers import get_top_crypto
 from .models import TrackedCurrency
 
+
 class IndexApiView(ListCreateAPIView):
     queryset = get_top_crypto()
     pagination_class = CryptoPaginator
@@ -29,7 +30,7 @@ class IndexApiView(ListCreateAPIView):
 
 class TrackedCurrencyList(ListAPIView):
     serializer_class = IndexSerializer
-    permission_classes = (IsAuthenticated, )
+    permission_classes = (IsAuthenticated,)
     pagination_class = None
 
     def get_queryset(self):
@@ -46,7 +47,7 @@ class TrackedCurrencyList(ListAPIView):
 
 
 class TrackedCurrencyDestroy(DestroyAPIView):
-    permission_classes = (IsAuthenticated, )
+    permission_classes = (IsAuthenticated,)
     serializer_class = TrackCurrencySerializer
     lookup_field = "currency_id"
 
