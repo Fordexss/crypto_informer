@@ -10,8 +10,9 @@ const News = () => {
     useEffect(() => {
         axios.get('http://localhost:8000/api/news/')
             .then(response => {
-                setNews(response.data.news);
+                setNews(response.data);
                 setLoading(false);
+                console.log(response)
             })
             .catch(error => {
                 console.error('Ошибка при загрузке новостей:', error);
