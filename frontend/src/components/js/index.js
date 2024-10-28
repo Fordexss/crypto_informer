@@ -136,6 +136,10 @@ function Index() {
   const UserTrackedCurrencies = async () => {
     const token = localStorage.getItem('accessToken');
 
+    if (!token) {
+      return null
+    }
+
     try {
       const response = await axios.get('http://127.0.0.1:8000/api/tracked-currencies-help/', {
         headers: {
@@ -246,16 +250,19 @@ function Index() {
                       title={`${(currentPage - 1) * 20 + index + 1}. ${crypto.name}`}
                       subheader={`$${parseFloat(crypto.quote.USD.price).toFixed(2)}`}
                       action={
-                        userData?.some(currency => currency.id === crypto.id) ? (
-                          <IconButton onClick={() => handleDeleteTrackClick(crypto.id)}>
-                            <Favorite />
-                          </IconButton>
-                        ) : (
-                          <IconButton onClick={() => handleTrackClick(crypto.id)}>
-                            <FavoriteBorder />
-                          </IconButton>
-                        )
-                      }
+                          userData ? (
+                            userData.some(currency => currency.id === crypto.id) ? (
+                              <IconButton onClick={() => handleDeleteTrackClick(crypto.id)}>
+                                <Favorite />
+                              </IconButton>
+                            ) : (
+                              <IconButton onClick={() => handleTrackClick(crypto.id)}>
+                                <FavoriteBorder />
+                              </IconButton>
+                            )
+                          ) : null
+                        }
+
                     />
                     <CardContent>
                       <Typography

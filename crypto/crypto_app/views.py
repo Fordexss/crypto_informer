@@ -1,5 +1,3 @@
-from django.http import JsonResponse
-from django.views import View
 from rest_framework.generics import (
     ListCreateAPIView,
     ListAPIView,
@@ -7,13 +5,13 @@ from rest_framework.generics import (
 )
 from rest_framework.permissions import IsAuthenticated
 
-from .helpers import *
 from .paginators import CryptoPaginator
 from .serializers import (
     IndexSerializer,
-    TrackCurrencySerializer
+    TrackCurrencySerializer,
+    CryptoNewsSerializer
 )
-from .helpers import get_top_crypto
+from .helpers import get_top_crypto, get_crypto_news
 from .models import TrackedCurrency
 
 
@@ -55,8 +53,6 @@ class TrackedCurrencyDestroy(DestroyAPIView):
         return TrackedCurrency.objects.filter(user=self.request.user)
 
 
-class CryptoNewsApiView(View):
-    def get(self, request, *args, **kwargs):
-        news = get_crypto_news()
-        news_f_temp = [{'title': article['title'], 'url': article['url']} for article in news] if news else []
-        return JsonResponse({'news': news_f_temp})
+class CryptoNewsApiView(ListAPIView):
+    queryset = get_crypto_news()
+    serializer_class = CryptoNewsSerializer

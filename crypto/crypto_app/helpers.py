@@ -1,4 +1,6 @@
 import os
+import pprint
+
 import requests
 from dotenv import load_dotenv
 
@@ -52,6 +54,19 @@ def get_crypto_news():
         'public': 'true',
     }
     response = requests.get(url_news, params=params)
-    data = response.json()
-    return data['results']
+
+    if response.status_code == 200:
+        data = response.json()
+        result = [
+            {
+                'id': news['id'],
+                'title': news['title'],
+                'url': news['url']
+            }
+            for news in data['results']
+        ]
+        pprint.pprint(result)
+        return result
+    else:
+        return []
 

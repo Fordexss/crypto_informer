@@ -35,8 +35,8 @@ class TrackCurrencySerializer(serializers.ModelSerializer):
         )
         return tracked_currency
 
-    # def delete(self, attrs):
-    #     TrackedCurrency.objects.get(
-    #         user=self.context["request"].user,
-    #         currency_id=attrs["currency_id"]
-    #     ).delete()
+
+class CryptoNewsSerializer(serializers.Serializer):
+    id = serializers.IntegerField()
+    title = serializers.CharField()
+    url = serializers.URLField()
