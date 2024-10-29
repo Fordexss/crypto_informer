@@ -1,17 +1,17 @@
 import React from 'react';
 import { BrowserRouter as Router, Route, Routes, Navigate } from 'react-router-dom';
-import Navbar from './components/navbar';
-import CryptoConverter from './components/converter';
-import News from './components/news';
-import Profile from './components/profile';
-import Login from './components/login';
-import Registration from './components/registration';
-import Index from './components/index';
-import CryptoGainersLosers from './components/gainers_and_losers';
-import CryptoTrending from './components/crypto_trending';
-import TrackedCurrencies from './components/tracked_currencies'
-import { ThemeProvider } from './components/theme_context';
-import Activation from './components/activation'
+import Navbar from './components/js/navbar';
+import CryptoConverter from './components/js/converter';
+import News from './components/js/news';
+import Profile from './components/js/profile';
+import Login from './components/js/login';
+import Registration from './components/js/registration';
+import Index from './components/js/index';
+import CryptoGainersLosers from './components/js/gainers_and_losers';
+import CryptoTrending from './components/js/crypto_trending';
+import TrackedCurrencies from './components/js/tracked_currencies'
+import { ThemeProvider } from './components/js/theme_context';
+import Activation from './components/js/activation'
 
 function App() {
   return (

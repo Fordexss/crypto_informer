@@ -2,13 +2,13 @@ import {
   Avatar, Box, Button, Divider, FormControlLabel,
   Paper, Switch, Typography, useMediaQuery,
 } from '@mui/material';
-import { AccountCircle, Logout, CompareArrows } from '@mui/icons-material';
+import { AccountCircle, Logout, CompareArrows, CurrencyBitcoinOutlined } from '@mui/icons-material';
 import Swal from 'sweetalert2';
 import { useTheme } from './theme_context';
 import styled, { ThemeProvider } from 'styled-components';
-import React, { useState, useEffect } from 'react';
-import { CurrencyBitcoinOutlined } from '@mui/icons-material';
+import React, { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import axios from 'axios';
 
 const ProfileContainer = styled(Box)`
   display: flex;
@@ -30,7 +30,7 @@ const StyledPaper = styled(Paper)`
 
 const Profile = () => {
   const navigate = useNavigate();
-  const { isDarkMode, toggleTheme, theme } = useTheme();
+  const { isDarkMode, toggleTheme } = useTheme();
   const isSmallScreen = useMediaQuery('(max-width: 600px)');
 
   useEffect(() => {
@@ -38,17 +38,54 @@ const Profile = () => {
       .split('; ')
       .find((row) => row.startsWith('dark_theme='))
       ?.split('=')[1];
+
     if (cookieTheme === 'true' && !isDarkMode) {
       toggleTheme();
     } else if (cookieTheme === 'false' && isDarkMode) {
       toggleTheme();
     }
-  }, []);
 
-  const handleThemeChange = (event) => {
-    toggleTheme();
-    const newTheme = event.target.checked ? 'true' : 'false';
-    document.cookie = `dark_theme=${newTheme}; path=/;`;
+    const fetchThemePreference = async () => {
+      try {
+        const accessToken = localStorage.getItem('accessToken');
+        const response = await axios.get('/api/user/profile/', {
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+          },
+        });
+        if (response.data.weekly_updates_enabled !== isDarkMode) {
+          toggleTheme();
+        }
+      } catch (error) {
+        console.error("Error fetching theme preference:", error);
+      }
+    };
+    fetchThemePreference();
+  }, [isDarkMode, toggleTheme]);
+
+  const handleThemeChange = async (event) => {
+    try {
+      const newTheme = event.target.checked;
+      toggleTheme();
+      document.cookie = `dark_theme=${newTheme}; path=/;`;
+
+      const accessToken = localStorage.getItem('accessToken');
+      const response = await axios.patch('/api/user/profile/', {
+        weekly_updates_enabled: newTheme,
+      }, {
+        headers: {
+          'Authorization': `Bearer ${accessToken}`,
+        },
+      });
+
+      if (response.status !== 200) {
+        console.error('Failed to update theme preference:', response.data);
+        Swal.fire('Error', 'Failed to update theme preference.', 'error');
+      }
+    } catch (error) {
+      console.error('Error updating theme preference:', error);
+      Swal.fire('Error', 'Failed to update theme preference.', 'error');
+    }
   };
 
   const handleLogout = async () => {
@@ -57,7 +94,7 @@ const Profile = () => {
       localStorage.removeItem('refreshToken');
 
       Swal.fire('Success', 'You have successfully logged out!', 'success').then(() => {
-        navigate('/home');
+        navigate('/home'); // Or wherever you redirect after logout
       });
     } catch (error) {
       console.error('Error during logout:', error);
@@ -109,15 +146,15 @@ const Profile = () => {
           >
             Converter
           </Button>
-        <Button
-          variant="contained"
-          color="primary"
-          onClick={handleTrackedCurrenciesClick}
-          startIcon={<CurrencyBitcoinOutlined />}
-          sx={{ mt: 2, mb: 1, width: '100%' }}
-        >
-          Відслідковувані Валюти
-        </Button>
+          <Button
+            variant="contained"
+            color="primary"
+            onClick={handleTrackedCurrenciesClick}
+            startIcon={<CurrencyBitcoinOutlined />}
+            sx={{ mt: 2, mb: 1, width: '100%' }}
+          >
+            Відслідковувані Валюти
+          </Button>
           <Button
             variant="outlined"
             color="error"

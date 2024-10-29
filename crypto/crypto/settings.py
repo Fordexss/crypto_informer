@@ -209,11 +209,30 @@ SIMPLE_JWT = {
     "SLIDING_TOKEN_OBTAIN_SERIALIZER": "rest_framework_simplejwt.serializers.TokenObtainSlidingSerializer",
     "SLIDING_TOKEN_REFRESH_SERIALIZER": "rest_framework_simplejwt.serializers.TokenRefreshSlidingSerializer",
 }
-
+# SMTP settings
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_HOST = 'smtp.gmail.com'
-EMAIL_HOST_USER = 'informercrypto7@gmail.com'
-EMAIL_HOST_PASSWORD = 'msysaufwpryqlsjo'
+EMAIL_HOST_USER = 'cryptoinformer887@gmail.com'
+EMAIL_HOST_PASSWORD = 'hbwfvwfuhbobdbwz'
 EMAIL_PORT = 587
 EMAIL_USE_TLS = True
 FRONTEND_URL = 'http://localhost:3000'
+DEFAULT_FROM_EMAIL = 'cryptoinformer887@gmail.com'
+
+# Celery settings
+CELERY_BACKEND = 'redis://localhost:6379/3'
+CELERY_BROKER_URL = 'redis://localhost:6379/4'
+CELERY_RESULT_BACKEND = 'redis://localhost:6379/5'
+
+CELERY_TASK_SERIALIZER = 'json'
+CELERY_RESULT_SERIALIZER = 'json'
+CELERY_ACCEPT_CONTENT = ['json']
+CELERY_ENABLE_UTC = True
+
+# Celery beat settings
+CELERY_BEAT_SCHEDULE = {
+    'send-weekly-updates-every-20-seconds': {
+        'task': 'crypto_app.tasks.send_weekly_updates',
+        'schedule': timedelta(seconds=20),
+    },
+}

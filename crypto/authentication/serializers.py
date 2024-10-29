@@ -36,3 +36,8 @@ class RegistrationSerializer(serializers.ModelSerializer):
         )
 
         return user
+
+class UserSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = CustomUser
+        fields = ['weekly_updates_enabled']
