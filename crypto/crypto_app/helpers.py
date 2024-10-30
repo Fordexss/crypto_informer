@@ -1,5 +1,4 @@
 import os
-import pprint
 
 import requests
 from dotenv import load_dotenv
@@ -65,7 +64,6 @@ def get_crypto_news():
             }
             for news in data['results']
         ]
-        pprint.pprint(result)
         return result
     else:
         return []
