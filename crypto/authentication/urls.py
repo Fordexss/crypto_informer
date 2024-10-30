@@ -6,7 +6,7 @@ from rest_framework_simplejwt.views import (
 )
 
 from . import views
-from .views import ActivateAccountView
+from .views import ActivateAccountView, ProfileView
 
 app_name = 'auth'
 
@@ -15,5 +15,5 @@ urlpatterns = [
     path('token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
     path('token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
     path('activate/<uuid:token>/', ActivateAccountView.as_view(), name='activate'),
-    path('api/user/profile/', views.UserProfileView.as_view(), name='user-profile'),
+    path('profile/', ProfileView.as_view(), name='profile'),
 ]

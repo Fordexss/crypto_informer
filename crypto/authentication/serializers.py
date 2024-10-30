@@ -40,4 +40,4 @@ class RegistrationSerializer(serializers.ModelSerializer):
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = CustomUser
-        fields = ['weekly_updates_enabled']
+        fields = ['username', 'email', 'weekly_updates_enabled']

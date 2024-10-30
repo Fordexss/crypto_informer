@@ -6,7 +6,7 @@ import { AccountCircle, Logout, CompareArrows, CurrencyBitcoinOutlined } from '@
 import Swal from 'sweetalert2';
 import { useTheme } from './theme_context';
 import styled, { ThemeProvider } from 'styled-components';
-import React, { useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 
@@ -32,59 +32,82 @@ const Profile = () => {
   const navigate = useNavigate();
   const { isDarkMode, toggleTheme } = useTheme();
   const isSmallScreen = useMediaQuery('(max-width: 600px)');
+  const [weeklyUpdatesEnabled, setWeeklyUpdatesEnabled] = useState(false);
 
   useEffect(() => {
+    const fetchProfileData = async () => {
+      try {
+        const accessToken = localStorage.getItem('accessToken');
+
+        if (!accessToken) {
+          console.error("Токен доступа не найден.");
+          return;
+        }
+
+        console.log("Токен в useEffect:", accessToken);
+
+        const response = await axios.get('/auth/profile/', {
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+          },
+        });
+        setWeeklyUpdatesEnabled(response.data.weekly_updates_enabled);
+      } catch (error) {
+        console.error('Error fetching profile data:', error);
+        if (error.response && error.response.status === 401) {
+          console.error("Ошибка авторизации. Возможно, токен доступа недействителен.");
+        }
+      }
+    };
+
+    fetchProfileData();
+
     const cookieTheme = document.cookie
       .split('; ')
       .find((row) => row.startsWith('dark_theme='))
       ?.split('=')[1];
-
     if (cookieTheme === 'true' && !isDarkMode) {
       toggleTheme();
     } else if (cookieTheme === 'false' && isDarkMode) {
       toggleTheme();
     }
+  }, []);
 
-    const fetchThemePreference = async () => {
-      try {
-        const accessToken = localStorage.getItem('accessToken');
-        const response = await axios.get('/api/user/profile/', {
-          headers: {
-            Authorization: `Bearer ${accessToken}`,
-          },
-        });
-        if (response.data.weekly_updates_enabled !== isDarkMode) {
-          toggleTheme();
-        }
-      } catch (error) {
-        console.error("Error fetching theme preference:", error);
-      }
-    };
-    fetchThemePreference();
-  }, [isDarkMode, toggleTheme]);
+  const handleThemeChange = (event) => {
+    toggleTheme();
+    const newTheme = event.target.checked ? 'true' : 'false';
+    document.cookie = `dark_theme=${newTheme}; path=/;`;
+  };
 
-  const handleThemeChange = async (event) => {
+  const handleWeeklyUpdatesChange = async (event) => {
+    const newValue = event.target.checked;
+    setWeeklyUpdatesEnabled(newValue);
+
     try {
-      const newTheme = event.target.checked;
-      toggleTheme();
-      document.cookie = `dark_theme=${newTheme}; path=/;`;
-
       const accessToken = localStorage.getItem('accessToken');
-      const response = await axios.patch('/api/user/profile/', {
-        weekly_updates_enabled: newTheme,
-      }, {
+
+      if (!accessToken) {
+        console.error("Токен доступа не найден.");
+        alert("Ошибка авторизации. Пожалуйста, войдите снова.");
+        setWeeklyUpdatesEnabled(!newValue);
+        return;
+      }
+
+      console.log("Токен в handleWeeklyUpdatesChange:", accessToken);
+
+      await axios.patch('/auth/profile/', { weekly_updates_enabled: newValue }, {
         headers: {
-          'Authorization': `Bearer ${accessToken}`,
+          Authorization: `Bearer ${accessToken}`,
         },
       });
-
-      if (response.status !== 200) {
-        console.error('Failed to update theme preference:', response.data);
-        Swal.fire('Error', 'Failed to update theme preference.', 'error');
-      }
     } catch (error) {
-      console.error('Error updating theme preference:', error);
-      Swal.fire('Error', 'Failed to update theme preference.', 'error');
+      console.error('Error updating weekly updates setting:', error);
+      setWeeklyUpdatesEnabled(!newValue);
+      alert(`Не удалось обновить настройки. Попробуйте еще раз. Ошибка: ${error.message}`);
+      if (error.response && error.response.status === 401) {
+        console.error("Ошибка авторизации. Возможно, токен доступа недействителен.");
+        alert("Ошибка авторизации. Пожалуйста, войдите снова.");
+      }
     }
   };
 
@@ -94,7 +117,7 @@ const Profile = () => {
       localStorage.removeItem('refreshToken');
 
       Swal.fire('Success', 'You have successfully logged out!', 'success').then(() => {
-        navigate('/home'); // Or wherever you redirect after logout
+        navigate('/home');
       });
     } catch (error) {
       console.error('Error during logout:', error);
@@ -133,10 +156,12 @@ const Profile = () => {
           <Divider sx={{ mb: 2 }} />
 
           <FormControlLabel
-            control={<Switch checked={isDarkMode} onChange={handleThemeChange} />}
-            label="Dark Mode"
+            control={<Switch checked={weeklyUpdatesEnabled} onChange={handleWeeklyUpdatesChange} />}
+            label="Weekly Updates"
             sx={{ mb: 2 }}
           />
+
+
           <Button
             variant="contained"
             color="primary"

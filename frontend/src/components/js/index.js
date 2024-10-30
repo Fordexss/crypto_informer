@@ -286,6 +286,10 @@ function Index() {
                         {crypto.quote.USD.percent_change_7d < 0 ? <ArrowDownward /> : <ArrowUpward />}
                         {parseFloat(crypto.quote.USD.percent_change_7d).toFixed(2)}% (7d)
                       </Typography>
+
+                      <Typography variant="body2">
+                        Market Cap: ${parseFloat(crypto.quote.USD.market_cap).toFixed(2)}
+                      </Typography>
                     </CardContent>
                   </Card>
                 </Grid>
@@ -293,11 +297,11 @@ function Index() {
             </Grid>
             <Pagination
               count={totalPages}
-              page={currentPage}
-              onChange={handlePageChange}
-              color="primary"
-              variant="outlined"
-              shape="rounded"
+            page={currentPage}
+            onChange={handlePageChange}
+            variant="outlined"
+            color="primary"
+            sx={{ display: 'flex', justifyContent: 'center', mb: 4 }}
             />
           </>
         )}

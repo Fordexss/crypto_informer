@@ -24,17 +24,21 @@ class ActivateAccountView(generics.RetrieveUpdateAPIView):
         instance.save()
         return super().retrieve(request, *args, **kwargs)
 
-class UserProfileView(RetrieveUpdateAPIView):
+
+class ProfileView(generics.RetrieveUpdateAPIView):
     serializer_class = UserSerializer
     permission_classes = [permissions.IsAuthenticated]
 
     def get_object(self):
         return self.request.user
 
-    def update(self, request, *args, **kwargs):
-        partial = kwargs.pop('partial', False)
+    def partial_update(self, request, *args, **kwargs):
         instance = self.get_object()
-        serializer = self.get_serializer(instance, data=request.data, partial=partial)
+        serializer = self.get_serializer(instance, data=request.data, partial=True)
         serializer.is_valid(raise_exception=True)
-        self.perform_update(serializer)
+
+        # Здесь происходит изменение значения weekly_updates_enabled
+        instance.weekly_updates_enabled = serializer.validated_data.get('weekly_updates_enabled', instance.weekly_updates_enabled)
+        instance.save()
+
         return Response(serializer.data)
