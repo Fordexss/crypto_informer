@@ -37,7 +37,6 @@ class ProfileView(generics.RetrieveUpdateAPIView):
         serializer = self.get_serializer(instance, data=request.data, partial=True)
         serializer.is_valid(raise_exception=True)
 
-        # Здесь происходит изменение значения weekly_updates_enabled
         instance.weekly_updates_enabled = serializer.validated_data.get('weekly_updates_enabled', instance.weekly_updates_enabled)
         instance.save()
 
