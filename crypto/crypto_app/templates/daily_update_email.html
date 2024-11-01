@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Daily Crypto Updates</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" integrity="sha512-9usAa10IRO0HhonpyAIVpjrylPvoDwiPUiKdWk5t3PyolY1cOd4DSE0Ga+ri4AuTroPR5aQvXU9xC6qOPnzFeg==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <style>
+        body {
+            font-family: sans-serif;
+        }
+        .table-responsive {
+            overflow-x: auto;
+        }
+        .table thead th {
+            background-color: #007bff;
+            color: white;
+        }
+        .up {
+            color: green;
+        }
+        .down {
+            color: red;
+        }
+        .change {
+            display: flex;
+            align-items: center;
+            justify-content: flex-start;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1 class="mt-4">Your Daily Crypto Updates</h1>
+        <div class="table-responsive">
+            <table class="table table-striped table-bordered">
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Symbol</th>
+                        <th>Price (USD)</th>
+                        <th>24h Change</th>
+                        <th>Market Cap (USD)</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for crypto in crypto_data %}
+                    <tr >
+                        <td>{{ crypto.name }}</td>
+                        <td>{{ crypto.symbol }}</td>
+                        <td>${{ crypto.quote.USD.price|floatformat:2 }}</td>
+                        <td class="change {% if crypto.quote.USD.percent_change_24h > 0 %}up{% else %}down{% endif %}">
+                           <i class="fas fa-arrow-{% if crypto.quote.USD.percent_change_24h > 0 %}up{% else %}down{% endif %}"></i>&nbsp;
+                           <span>{{ crypto.quote.USD.percent_change_24h|floatformat:2 }}%</span>
+                        </td>
+                        <td>${{ crypto.quote.USD.market_cap|floatformat:2 }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</body>
+</html>

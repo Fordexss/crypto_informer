@@ -52,12 +52,12 @@ const Login = () => {
       localStorage.setItem('accessToken', response.data.access);
       localStorage.setItem('refreshToken', response.data.refresh);
 
-      Swal.fire('Успех', 'Вход успешный!', 'success').then(() => {
+      Swal.fire('Success', 'Login Successful', 'success').then(() => {
         navigate('/profile');
       });
     } catch (error) {
-      console.error('Ошибка при входе:', error.response.data);
-      Swal.fire('Ошибка', error.response.data.detail || 'Проверьте введенные данные.', 'error');
+      console.error('Login error:', error.response.data);
+      Swal.fire('Error', error.response.data.detail || 'Check the data you have entered', 'error');
     } finally {
       setLoading(false);
     }
@@ -121,7 +121,7 @@ const Login = () => {
               </Grid>
               <Grid item xs={12}>
                 <TextField
-                  label="Пароль"
+                  label="Password"
                   type={showPassword ? 'text' : 'password'}
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
@@ -148,18 +148,18 @@ const Login = () => {
                   size="large"
                   disabled={loading}
                 >
-                  {loading ? <CircularProgress size={24} color="inherit" /> : 'Вхід'}
+                  {loading ? <CircularProgress size={24} color="inherit" /> : 'Login'}
                 </Button>
               </Grid>
               <Grid item xs={12}>
                 <Typography align="center">
-                  Немає акаунту?{' '}
+                  Don't have an account?{' '}
                   <Button
                     color="secondary"
                     onClick={() => navigate('/registration')}
                     size="small"
                   >
-                    Зареєструватися
+                    Registration
                   </Button>
                 </Typography>
               </Grid>

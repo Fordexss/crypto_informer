@@ -18,8 +18,6 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-DB_USER = os.getenv('DB_USER')
-DB_PASSWORD = os.getenv('DB_PASSWORD')
 SECRET_KEY = os.getenv('SECRET_KEY')
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -28,13 +26,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.0/howto/deployment/checklist/
 
-# SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = SECRET_KEY
-
-# SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
-
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['*']
 
 # Application definition
 
@@ -51,16 +43,6 @@ INSTALLED_APPS = [
     'rest_framework_simplejwt',
     'authentication'
 ]
-
-# CORS_ALLOW_HEADERS = [
-#     'http_x_csrftoken',
-#     'content-type',
-#     'accept',
-#     'origin',
-#     'x-requested-with',
-#     'x-csrftoken',
-# ]
-
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -118,8 +100,8 @@ DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
         'NAME': 'postgres',
-        'USER': DB_USER,
-        'PASSWORD': DB_PASSWORD,
+        'USER': os.getenv('DB_USER'),
+        'PASSWORD': os.getenv('DB_PASSWORD'),
         'HOST': 'aws-0-eu-central-1.pooler.supabase.com',
         'PORT': '6543',
     }
@@ -170,6 +152,7 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 AUTH_USER_MODEL = 'authentication.CustomUser'
 
+# JWT settings
 SIMPLE_JWT = {
     "ACCESS_TOKEN_LIFETIME": timedelta(days=1),
     "REFRESH_TOKEN_LIFETIME": timedelta(days=1),
@@ -209,11 +192,12 @@ SIMPLE_JWT = {
     "SLIDING_TOKEN_OBTAIN_SERIALIZER": "rest_framework_simplejwt.serializers.TokenObtainSlidingSerializer",
     "SLIDING_TOKEN_REFRESH_SERIALIZER": "rest_framework_simplejwt.serializers.TokenRefreshSlidingSerializer",
 }
+
 # SMTP settings
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_HOST_USER = 'cryptoinformer887@gmail.com'
-EMAIL_HOST_PASSWORD = 'hbwfvwfuhbobdbwz'
+EMAIL_HOST_PASSWORD = os.getenv('EMAIL_HOST_PASSWORD')
 EMAIL_PORT = 587
 EMAIL_USE_TLS = True
 FRONTEND_URL = 'http://localhost:3000'
@@ -231,8 +215,8 @@ CELERY_ENABLE_UTC = True
 
 # Celery beat settings
 CELERY_BEAT_SCHEDULE = {
-    'send-weekly-updates-every-20-seconds': {
-        'task': 'crypto_app.tasks.send_weekly_updates',
-        'schedule': timedelta(seconds=20),
+    'send-daily-updates-every-2-minutes': {
+        'task': 'crypto_app.tasks.send_daily_updates',
+        'schedule': timedelta(minutes=2),
     },
 }

@@ -109,7 +109,7 @@ function Index() {
     };
 
     try {
-      await axios.delete(`http://127.0.0.1:8000/api/tracked-currencies/${cryptoId}/`, {
+      await axios.delete(`http://localhost:8000/api/tracked-currencies/${cryptoId}/`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -127,7 +127,7 @@ function Index() {
         fetchData(currentPage);
       }
     } catch (error) {
-      setError('На цій сторінці нема криптовалют');
+      setError('No cryptocurrencies on this page');
     }
   };
 
@@ -209,7 +209,7 @@ function Index() {
           <Alert severity="error">{error}</Alert>
         ) : topCrypto.length === 0 ? (
           <Alert severity="info" sx={{ my: 4 }}>
-            Ви поки не додали криптовалюти
+            You haven't added any cryptocurrencies
           </Alert>
         ) : (
           <>

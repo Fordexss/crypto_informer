@@ -7,8 +7,8 @@ import Swal from 'sweetalert2';
 import { useTheme } from './theme_context';
 import styled, { ThemeProvider } from 'styled-components';
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
+import { useNavigate } from 'react-router-dom';
 
 const ProfileContainer = styled(Box)`
   display: flex;
@@ -32,7 +32,7 @@ const Profile = () => {
   const navigate = useNavigate();
   const { isDarkMode, toggleTheme } = useTheme();
   const isSmallScreen = useMediaQuery('(max-width: 600px)');
-  const [weeklyUpdatesEnabled, setWeeklyUpdatesEnabled] = useState(false);
+  const [dailyUpdatesEnabled, setDailyUpdatesEnabled] = useState(false);
 
   useEffect(() => {
     const fetchProfileData = async () => {
@@ -40,22 +40,20 @@ const Profile = () => {
         const accessToken = localStorage.getItem('accessToken');
 
         if (!accessToken) {
-          console.error("Токен доступа не найден.");
+          console.error("Access token not found");
           return;
         }
 
-        console.log("Токен в useEffect:", accessToken);
-
-        const response = await axios.get('/auth/profile/', {
+        const response = await axios.get('http://127.0.0.1:8000/api/auth/profile/', {
           headers: {
             Authorization: `Bearer ${accessToken}`,
           },
         });
-        setWeeklyUpdatesEnabled(response.data.weekly_updates_enabled);
+        setDailyUpdatesEnabled(response.data.daily_updates_enabled);
       } catch (error) {
         console.error('Error fetching profile data:', error);
         if (error.response && error.response.status === 401) {
-          console.error("Ошибка авторизации. Возможно, токен доступа недействителен.");
+          console.error("Authorization error. The access token may be invalid.");
         }
       }
     };
@@ -79,34 +77,32 @@ const Profile = () => {
     document.cookie = `dark_theme=${newTheme}; path=/;`;
   };
 
-  const handleWeeklyUpdatesChange = async (event) => {
+  const handleDailyUpdatesChange = async (event) => {
     const newValue = event.target.checked;
-    setWeeklyUpdatesEnabled(newValue);
+    setDailyUpdatesEnabled(newValue);
 
     try {
       const accessToken = localStorage.getItem('accessToken');
 
       if (!accessToken) {
-        console.error("Токен доступа не найден.");
-        alert("Ошибка авторизации. Пожалуйста, войдите снова.");
-        setWeeklyUpdatesEnabled(!newValue);
+        console.error("Access token not found");
+        alert("Authorization error. Please log in again");
+        setDailyUpdatesEnabled(!newValue);
         return;
       }
 
-      console.log("Токен в handleWeeklyUpdatesChange:", accessToken);
-
-      await axios.patch('/auth/profile/', { weekly_updates_enabled: newValue }, {
+      await axios.patch('http://127.0.0.1:8000/api/auth/profile/', { daily_updates_enabled: newValue }, {
         headers: {
           Authorization: `Bearer ${accessToken}`,
         },
       });
     } catch (error) {
-      console.error('Error updating weekly updates setting:', error);
-      setWeeklyUpdatesEnabled(!newValue);
-      alert(`Не удалось обновить настройки. Попробуйте еще раз. Ошибка: ${error.message}`);
+      console.error('Error updating daily updates setting:', error);
+      setDailyUpdatesEnabled(!newValue);
+      alert(`Failed to update the settings. Try again. Error: ${error.message}`);
       if (error.response && error.response.status === 401) {
-        console.error("Ошибка авторизации. Возможно, токен доступа недействителен.");
-        alert("Ошибка авторизации. Пожалуйста, войдите снова.");
+        console.error("Authorization error. The access token may be invalid");
+        alert("Authorization error. Please log in again");
       }
     }
   };
@@ -121,7 +117,7 @@ const Profile = () => {
       });
     } catch (error) {
       console.error('Error during logout:', error);
-      Swal.fire('Error', 'An error occurred during logout.', 'error');
+      Swal.fire('Error!', 'An error occurred while logging out', 'error');
     }
   };
 
@@ -156,11 +152,15 @@ const Profile = () => {
           <Divider sx={{ mb: 2 }} />
 
           <FormControlLabel
-            control={<Switch checked={weeklyUpdatesEnabled} onChange={handleWeeklyUpdatesChange} />}
-            label="Weekly Updates"
+            control={<Switch checked={dailyUpdatesEnabled} onChange={handleDailyUpdatesChange} />}
+            label="Send a daily update notifications"
             sx={{ mb: 2 }}
           />
-
+          <FormControlLabel
+            control={<Switch checked={isDarkMode} onChange={handleThemeChange} />}
+            label="Dark theme"
+            sx={{ mb: 2 }}
+          />
 
           <Button
             variant="contained"
@@ -178,7 +178,7 @@ const Profile = () => {
             startIcon={<CurrencyBitcoinOutlined />}
             sx={{ mt: 2, mb: 1, width: '100%' }}
           >
-            Відслідковувані Валюти
+            Tracked currencies
           </Button>
           <Button
             variant="outlined"
@@ -187,7 +187,7 @@ const Profile = () => {
             startIcon={<Logout />}
             sx={{ mt: 1, width: '100%' }}
           >
-            Logout
+            Log out
           </Button>
         </StyledPaper>
       </ProfileContainer>

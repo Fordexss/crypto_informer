@@ -15,8 +15,8 @@ const News = () => {
                 console.log(response)
             })
             .catch(error => {
-                console.error('Ошибка при загрузке новостей:', error);
-                setError('Не удалось загрузить новости.');
+                console.error('Error when loading news:', error);
+                setError('Failed to load the news');
                 setLoading(false);
             });
     }, []);
@@ -25,7 +25,7 @@ const News = () => {
         return (
             <div className="d-flex justify-content-center align-items-center" style={{ height: '100vh' }}>
                 <Spinner animation="border" role="status">
-                    <span className="visually-hidden">Загрузка...</span>
+                    <span className="visually-hidden">Loading...</span>
                 </Spinner>
             </div>
         );
@@ -41,7 +41,7 @@ const News = () => {
 
     return (
         <Container className="mt-5">
-            <h2 className="text-center mb-4">Новости криптовалют</h2>
+            <h2 className="text-center mb-4">Cryptocurrency News</h2>
             <Row xs={1} md={2} lg={3} className="g-4">
                 {news.map((article, index) => (
                     <Col key={index}>

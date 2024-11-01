@@ -29,23 +29,23 @@ const Activation = () => {
         setSuccess(true);
         setActivationAttempted(true);
         Swal.fire({
-          title: 'Успіх!',
-          text: 'Ваш акаунт успішно активовано!',
+          title: 'Success!',
+          text: 'Your account has been successfully activated!',
           icon: 'success',
-          confirmButtonText: 'Перейти до входу'
+          confirmButtonText: 'Log in'
         }).then(() => {
           navigate('/login', { replace: true });
         });
       } catch (error) {
         console.error('Activation error:', error);
-        setError(error.response?.data?.error || 'Помилка активації акаунту');
+        setError(error.response?.data?.error || 'Account activation error');
         setActivationAttempted(true);
         if (error.response?.status === 400) {
           navigate('/login', { replace: true });
         } else {
           Swal.fire({
-            title: 'Помилка!',
-            text: 'Неправильне посилання або акаунт вже активовано.',
+            title: 'Error!',
+            text: 'Invalid link or account is already activated',
             icon: 'error',
             confirmButtonText: 'OK'
           });
@@ -58,7 +58,7 @@ const Activation = () => {
     if (token && !activationAttempted) {
       activateAccount();
     } else if (!token) {
-      setError('Token не знайдено');
+      setError('Token not found');
       setLoading(false);
     }
   }, [token, navigate, activationAttempted]);
@@ -82,7 +82,7 @@ const Activation = () => {
         >
           <CircularProgress size={60} />
           <Typography variant="h6">
-            Активація акаунту...
+            Account activation...
           </Typography>
         </Box>
       </Container>
@@ -112,7 +112,7 @@ const Activation = () => {
                 color="error"
                 gutterBottom
               >
-                Помилка активації
+                Activation error
               </Typography>
               <Typography
                 variant="body1"
@@ -126,7 +126,7 @@ const Activation = () => {
                 onClick={() => navigate('/registration', { replace: true })}
                 sx={{ mt: 2 }}
               >
-                Повернутися до реєстрації
+                Return to registration
               </Button>
             </>
           ) : success ? (
@@ -136,21 +136,21 @@ const Activation = () => {
                 color="primary"
                 gutterBottom
               >
-                Акаунт успішно активовано
+                Account has been successfully activated
               </Typography>
               <Typography
                 variant="body1"
                 color="text.secondary"
                 paragraph
               >
-                Тепер ви можете увійти у свій акаунт
+                You can now log in to your account
               </Typography>
               <Button
                 variant="contained"
                 onClick={() => navigate('/login', { replace: true })}
                 sx={{ mt: 2 }}
               >
-                Перейти до входу
+                Go to the log in
               </Button>
             </>
           ) : null}
