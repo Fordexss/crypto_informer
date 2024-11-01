@@ -1,4 +1,4 @@
-import React, { createContext, useState, useContext, useEffect } from 'react';
+import React, { createContext, useState, useContext } from 'react';
 import { createTheme, ThemeProvider as MuiThemeProvider } from '@mui/material';
 import { CssBaseline } from '@mui/material';
 
@@ -27,13 +27,11 @@ const darkTheme = createTheme({
 export const ThemeProvider = ({ children }) => {
   const [isDarkMode, setIsDarkMode] = useState(false);
 
-  // Function to set a cookie
   const setCookie = (name, value, days) => {
     const expires = days ? `; expires=${new Date(Date.now() + days * 864e5).toUTCString()}` : '';
     document.cookie = `${name}=${encodeURIComponent(value)}${expires}; path=/`;
   };
 
-  // Function to get a cookie
   const getCookie = (name) => {
     return document.cookie.split('; ').reduce((r, c) => {
       const [key, ...v] = c.split('=');
@@ -41,7 +39,6 @@ export const ThemeProvider = ({ children }) => {
     }, '');
   };
 
-  // Check the cookie when the component mounts
   useEffect(() => {
     const themeCookie = getCookie('dark_theme');
     if (themeCookie === 'true') {

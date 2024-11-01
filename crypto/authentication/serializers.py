@@ -1,3 +1,4 @@
+from django.template.loader import render_to_string
 from rest_framework import serializers
 from .models import CustomUser
 from django.core.mail import send_mail
@@ -36,3 +37,14 @@ class RegistrationSerializer(serializers.ModelSerializer):
         )
 
         return user
+
+class UserSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = CustomUser
+        fields = ['username', 'email', 'daily_updates_enabled']
+        read_only_fields = ['username', 'email']
+
+    def update(self, instance, validated_data):
+        instance.daily_updates_enabled = validated_data.get('daily_updates_enabled', instance.daily_updates_enabled)
+        instance.save()
+        return instance

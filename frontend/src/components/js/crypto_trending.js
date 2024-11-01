@@ -127,10 +127,10 @@ const CryptoItem = ({ coin }) => {
         </div>
       </div>
       <div className="crypto-stats">
-        <div><strong>Цена:</strong> ${coin.current_price.toFixed(2)}</div>
-        <div><strong>Объем:</strong> ${coin.total_volume.toLocaleString()}</div>
-        <div><strong>Рыночная капитализация:</strong> ${coin.market_cap.toLocaleString()}</div>
-        <div><strong>Изменение за 24ч:</strong> {coin.price_change_percentage_24h.toFixed(2)}%</div>
+        <div><strong>Price:</strong> ${coin.current_price.toFixed(2)}</div>
+        <div><strong>Volume:</strong> ${coin.total_volume.toLocaleString()}</div>
+        <div><strong>Market cap:</strong> ${coin.market_cap.toLocaleString()}</div>
+        <div><strong>Change per 24h:</strong> {coin.price_change_percentage_24h.toFixed(2)}%</div>
       </div>
       <div className="crypto-chart">
         <canvas ref={chartRef} />
@@ -151,7 +151,7 @@ const CryptoTrending = () => {
         const data = await response.json();
         setTrending(data);
       } catch (error) {
-        console.error('Ошибка при получении данных:', error);
+        console.error('Error in data retrieval:', error);
       }
     };
 
@@ -160,7 +160,7 @@ const CryptoTrending = () => {
 
   return (
     <CryptoTrendingContainer theme={isDarkMode ? 'dark' : 'light'}>
-      <h1>Тренд топ 10 криптовалют</h1>
+      <h1>Top 10 cryptocurrencies trend</h1>
       <div id="trendingContainer">
         {trending.map(coin => <CryptoItem key={coin.id} coin={coin} />)}
       </div>

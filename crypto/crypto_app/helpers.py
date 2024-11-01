@@ -67,4 +67,3 @@ def get_crypto_news():
         return result
     else:
         return []
-

@@ -2,12 +2,12 @@ import {
   Avatar, Box, Button, Divider, FormControlLabel,
   Paper, Switch, Typography, useMediaQuery,
 } from '@mui/material';
-import { AccountCircle, Logout, CompareArrows } from '@mui/icons-material';
+import { AccountCircle, Logout, CompareArrows, CurrencyBitcoinOutlined } from '@mui/icons-material';
 import Swal from 'sweetalert2';
 import { useTheme } from './theme_context';
 import styled, { ThemeProvider } from 'styled-components';
 import React, { useState, useEffect } from 'react';
-import { CurrencyBitcoinOutlined } from '@mui/icons-material';
+import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 
 const ProfileContainer = styled(Box)`
@@ -30,10 +30,36 @@ const StyledPaper = styled(Paper)`
 
 const Profile = () => {
   const navigate = useNavigate();
-  const { isDarkMode, toggleTheme, theme } = useTheme();
+  const { isDarkMode, toggleTheme } = useTheme();
   const isSmallScreen = useMediaQuery('(max-width: 600px)');
+  const [dailyUpdatesEnabled, setDailyUpdatesEnabled] = useState(false);
 
   useEffect(() => {
+    const fetchProfileData = async () => {
+      try {
+        const accessToken = localStorage.getItem('accessToken');
+
+        if (!accessToken) {
+          console.error("Access token not found");
+          return;
+        }
+
+        const response = await axios.get('http://127.0.0.1:8000/api/auth/profile/', {
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+          },
+        });
+        setDailyUpdatesEnabled(response.data.daily_updates_enabled);
+      } catch (error) {
+        console.error('Error fetching profile data:', error);
+        if (error.response && error.response.status === 401) {
+          console.error("Authorization error. The access token may be invalid.");
+        }
+      }
+    };
+
+    fetchProfileData();
+
     const cookieTheme = document.cookie
       .split('; ')
       .find((row) => row.startsWith('dark_theme='))
@@ -51,6 +77,36 @@ const Profile = () => {
     document.cookie = `dark_theme=${newTheme}; path=/;`;
   };
 
+  const handleDailyUpdatesChange = async (event) => {
+    const newValue = event.target.checked;
+    setDailyUpdatesEnabled(newValue);
+
+    try {
+      const accessToken = localStorage.getItem('accessToken');
+
+      if (!accessToken) {
+        console.error("Access token not found");
+        alert("Authorization error. Please log in again");
+        setDailyUpdatesEnabled(!newValue);
+        return;
+      }
+
+      await axios.patch('http://127.0.0.1:8000/api/auth/profile/', { daily_updates_enabled: newValue }, {
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
+      });
+    } catch (error) {
+      console.error('Error updating daily updates setting:', error);
+      setDailyUpdatesEnabled(!newValue);
+      alert(`Failed to update the settings. Try again. Error: ${error.message}`);
+      if (error.response && error.response.status === 401) {
+        console.error("Authorization error. The access token may be invalid");
+        alert("Authorization error. Please log in again");
+      }
+    }
+  };
+
   const handleLogout = async () => {
     try {
       localStorage.removeItem('accessToken');
@@ -61,7 +117,7 @@ const Profile = () => {
       });
     } catch (error) {
       console.error('Error during logout:', error);
-      Swal.fire('Error', 'An error occurred during logout.', 'error');
+      Swal.fire('Error!', 'An error occurred while logging out', 'error');
     }
   };
 
@@ -96,10 +152,16 @@ const Profile = () => {
           <Divider sx={{ mb: 2 }} />
 
           <FormControlLabel
-            control={<Switch checked={isDarkMode} onChange={handleThemeChange} />}
-            label="Dark Mode"
+            control={<Switch checked={dailyUpdatesEnabled} onChange={handleDailyUpdatesChange} />}
+            label="Send a daily update notifications"
             sx={{ mb: 2 }}
           />
+          <FormControlLabel
+            control={<Switch checked={isDarkMode} onChange={handleThemeChange} />}
+            label="Dark theme"
+            sx={{ mb: 2 }}
+          />
+
           <Button
             variant="contained"
             color="primary"
@@ -109,15 +171,15 @@ const Profile = () => {
           >
             Converter
           </Button>
-        <Button
-          variant="contained"
-          color="primary"
-          onClick={handleTrackedCurrenciesClick}
-          startIcon={<CurrencyBitcoinOutlined />}
-          sx={{ mt: 2, mb: 1, width: '100%' }}
-        >
-          Відслідковувані Валюти
-        </Button>
+          <Button
+            variant="contained"
+            color="primary"
+            onClick={handleTrackedCurrenciesClick}
+            startIcon={<CurrencyBitcoinOutlined />}
+            sx={{ mt: 2, mb: 1, width: '100%' }}
+          >
+            Tracked currencies
+          </Button>
           <Button
             variant="outlined"
             color="error"
@@ -125,7 +187,7 @@ const Profile = () => {
             startIcon={<Logout />}
             sx={{ mt: 1, width: '100%' }}
           >
-            Logout
+            Log out
           </Button>
         </StyledPaper>
       </ProfileContainer>
