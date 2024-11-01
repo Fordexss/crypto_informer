@@ -217,6 +217,6 @@ CELERY_ENABLE_UTC = True
 CELERY_BEAT_SCHEDULE = {
     'send-daily-updates-every-2-minutes': {
         'task': 'crypto_app.tasks.send_daily_updates',
-        'schedule': timedelta(minutes=2),
+        'schedule': timedelta(seconds=20),
     },
 }
