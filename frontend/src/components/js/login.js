@@ -105,7 +105,7 @@ const Login = () => {
       <Container maxWidth="sm">
         <Box mt={5} p={4} boxShadow={3} borderRadius={5} bgcolor="background.paper">
           <Typography variant="h4" component="h2" align="center" gutterBottom>
-            Вхід
+            Log in
           </Typography>
           <form onSubmit={handleSubmit}>
             <Grid container spacing={2}>
