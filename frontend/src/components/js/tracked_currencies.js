@@ -14,7 +14,6 @@ import {
   Card,
   CardContent,
   CardHeader,
-  CardFooter,
   Grid,
   IconButton,
   CircularProgress,
@@ -107,34 +106,23 @@ function Index() {
     if (!token) {
       setError('No access token found. Please log in.');
       return;
-    };
+    }
 
     try {
+      setTopCrypto((prevCrypto) => prevCrypto.filter((crypto) => crypto.id !== cryptoId));
+
       await axios.delete(`http://localhost:8000/api/tracked-currencies/${cryptoId}/`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
       });
-      const response = await axios.get(`http://localhost:8000/api/tracked-currencies/?page=${currentPage}`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-
-      if (response.data.top_crypto.length === 0 && currentPage !== 1) {
-        setCurrentPage(1);
-        fetchData(1);
-      } else {
-        fetchData(currentPage);
-      }
     } catch (error) {
-      setCurrentPage(1)
-      fetchData(1)
-      setError('No cryptocurrencies on this page');
+      setError('Could not delete cryptocurrency: ' + error.message);
     }
   };
 
   useEffect(() => {
+    document.title = "Tracked currencies";
     AOS.init({ duration: 1000 });
     fetchData(currentPage);
 
@@ -251,7 +239,7 @@ function Index() {
                         {crypto.quote.USD.percent_change_7d < 0 ? <ArrowDownward /> : <ArrowUpward />}
                         {parseFloat(crypto.quote.USD.percent_change_7d).toFixed(2)}% (7d)
                       </Typography>
-                       <Typography variant="body2">
+                      <Typography variant="body2">
                         Market Cap: ${parseFloat(crypto.quote.USD.market_cap).toFixed(2)}
                       </Typography>
                     </CardContent>
@@ -261,12 +249,12 @@ function Index() {
             </Grid>
             {totalPages > 1 && (
               <Pagination
-              count={totalPages}
-              page={currentPage}
-              onChange={handlePageChange}
-              variant="outlined"
-              color="primary"
-              sx={{ display: 'flex', justifyContent: 'center', mb: 4 }}
+                count={totalPages}
+                page={currentPage}
+                onChange={handlePageChange}
+                variant="outlined"
+                color="primary"
+                sx={{ display: 'flex', justifyContent: 'center', mb: 4 }}
               />
             )}
           </>

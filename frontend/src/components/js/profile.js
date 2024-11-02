@@ -35,6 +35,7 @@ const Profile = () => {
   const [dailyUpdatesEnabled, setDailyUpdatesEnabled] = useState(false);
 
   useEffect(() => {
+    document.title = "Profile"
     const fetchProfileData = async () => {
       try {
         const accessToken = localStorage.getItem('accessToken');

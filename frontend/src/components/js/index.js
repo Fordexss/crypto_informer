@@ -96,21 +96,18 @@ function Index() {
     if (!token) {
       setError('No access token found. Please log in.');
       return;
-    };
+    }
 
-    const data = {
-      "currency_id": currencyId
-    };
+    const updatedUserData = [...userData, { id: currencyId }];
+    setUserData(updatedUserData);
 
     try {
-      await axios.post('http://127.0.0.1:8000/api/index/', data, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
+      await axios.post('http://127.0.0.1:8000/api/index/', { currency_id: currencyId }, {
+        headers: { Authorization: `Bearer ${token}` },
       });
-      fetchUserData();
     } catch (error) {
       setError('Failed to track currency. Please try again.');
+      setUserData(userData);
     }
   };
 
@@ -119,17 +116,18 @@ function Index() {
     if (!token) {
       setError('No access token found. Please log in.');
       return;
-    };
+    }
+
+    const updatedUserData = userData.filter((currency) => currency.id !== cryptoId);
+    setUserData(updatedUserData);
 
     try {
       await axios.delete(`http://127.0.0.1:8000/api/tracked-currencies/${cryptoId}/`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
+        headers: { Authorization: `Bearer ${token}` },
       });
-      fetchUserData();
     } catch (error) {
       setError('Failed to delete tracked currency. Please try again.');
+      setUserData(userData);
     }
   };
 
@@ -162,6 +160,7 @@ function Index() {
   };
 
   useEffect(() => {
+    document.title = 'CryptoInformer';
     AOS.init({ duration: 1000 });
     fetchData();
     fetchUserData();
@@ -262,7 +261,6 @@ function Index() {
                             )
                           ) : null
                         }
-
                     />
                     <CardContent>
                       <Typography
@@ -279,30 +277,17 @@ function Index() {
                         {crypto.quote.USD.percent_change_24h < 0 ? <ArrowDownward /> : <ArrowUpward />}
                         {parseFloat(crypto.quote.USD.percent_change_24h).toFixed(2)}% (24h)
                       </Typography>
-                      <Typography
-                        variant="body2"
-                        sx={{ color: crypto.quote.USD.percent_change_7d < 0 ? 'red' : 'green' }}
-                      >
-                        {crypto.quote.USD.percent_change_7d < 0 ? <ArrowDownward /> : <ArrowUpward />}
-                        {parseFloat(crypto.quote.USD.percent_change_7d).toFixed(2)}% (7d)
-                      </Typography>
-
-                      <Typography variant="body2">
-                        Market Cap: ${parseFloat(crypto.quote.USD.market_cap).toFixed(2)}
+                      <Typography variant="body2" color="textSecondary">
+                        Market Cap: ${parseFloat(crypto.quote.USD.market_cap).toLocaleString()}
                       </Typography>
                     </CardContent>
                   </Card>
                 </Grid>
               ))}
             </Grid>
-            <Pagination
-              count={totalPages}
-            page={currentPage}
-            onChange={handlePageChange}
-            variant="outlined"
-            color="primary"
-            sx={{ display: 'flex', justifyContent: 'center', mb: 4 }}
-            />
+            <Box display="flex" justifyContent="center" mt={4}>
+              <Pagination count={totalPages} page={currentPage} onChange={handlePageChange} />
+            </Box>
           </>
         )}
       </Container>

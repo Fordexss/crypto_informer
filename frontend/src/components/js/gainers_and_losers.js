@@ -165,6 +165,7 @@ function CryptoGainersLosers() {
   const { isDarkMode } = useTheme();
 
   useEffect(() => {
+    document.title = "Gainers and losers"
     const fetchCryptoData = async () => {
       try {
         const response = await fetch(`https://api.coingecko.com/api/v3/coins/markets?x_cg_demo_api_key=${apiKey}&vs_currency=usd&order=percent_change_24h&per_page=250&page=1`);

@@ -8,6 +8,7 @@ const News = () => {
     const [error, setError] = useState(null);
 
     useEffect(() => {
+        document.title = "News"
         axios.get('http://localhost:8000/api/news/')
             .then(response => {
                 setNews(response.data);

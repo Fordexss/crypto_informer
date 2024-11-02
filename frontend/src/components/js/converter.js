@@ -10,6 +10,7 @@ const CryptoConverter = () => {
   const [showFiatOnly, setShowFiatOnly] = useState(false);
 
   useEffect(() => {
+    document.title = "Converter"
     const delayDebounceFn = setTimeout(() => {
       if (amount && parseFloat(amount) > 0) {
         updateConversion();

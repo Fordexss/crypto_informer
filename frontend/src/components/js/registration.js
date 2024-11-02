@@ -44,6 +44,7 @@ const Registration = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
+    document.title = "Registration"
     const token = localStorage.getItem('accessToken');
     if (token) {
       navigate('/profile');

@@ -26,6 +26,7 @@ const Login = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
+  document.title = "Log in"
     const token = localStorage.getItem('accessToken');
     if (token) {
       navigate('/profile');
