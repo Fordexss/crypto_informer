@@ -40,9 +40,8 @@ const CryptoConverter = () => {
   };
 
   const formatCurrency = (value, currency) => {
-    let decimalPlaces = ['uah', 'usd', 'eur'].includes(currency) ? 2 : 8;
-    return value.toFixed(decimalPlaces).replace(/(\d)(?=(\d{3})+\.)/g, '$1,');
-  };
+      return value.toFixed(2).replace(/(\d)(?=(\d{3})+\.)/g, '$1,');
+    };
 
   const handleAmountChange = (event) => {
     let input = event.target.value;
