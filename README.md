@@ -33,7 +33,13 @@ To install the required packages, follow these steps:
    cd frontend
    npm install
 
-3. Now you can go to each directory and run the project:
+3. Open 3 new terminal windows. In the first one, start the redis server. After that, in the other 2 terminals, navigate to the crypto folder. In the second one, start the celery worker. And in the third one, run the celery beat
+   ```bash
+   start redis server > /etc/init.d/redis-server start
+   start celery worker > cd crypto > celery -A crypto worker --loglevel=info
+   start celery beat > cd crypto > celery -A crypto beat --loglevel=info
+
+4. Now you can go to each directory and run the project:
     ```bash
     cd frontend > npm start
     cd .. > cd crypto > python manage.py runserver
