@@ -74,6 +74,7 @@ REST_FRAMEWORK = {
 }
 
 ROOT_URLCONF = 'crypto.urls'
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 
 TEMPLATES = [
     {
@@ -204,9 +205,9 @@ FRONTEND_URL = 'http://localhost:3000'
 DEFAULT_FROM_EMAIL = 'cryptoinformer887@gmail.com'
 
 # Celery settings
-CELERY_BACKEND = 'redis://localhost:6379/3'
-CELERY_BROKER_URL = 'redis://localhost:6379/4'
-CELERY_RESULT_BACKEND = 'redis://localhost:6379/5'
+CELERY_BACKEND = 'redis://redis:6379/3'
+CELERY_BROKER_URL = 'redis://redis:6379/4'
+CELERY_RESULT_BACKEND = 'redis://redis:6379/5'
 
 CELERY_TASK_SERIALIZER = 'json'
 CELERY_RESULT_SERIALIZER = 'json'

@@ -135,7 +135,7 @@ function Index() {
     const token = localStorage.getItem('accessToken');
 
     if (!token) {
-      return null
+      return null;
     }
 
     try {
@@ -249,18 +249,18 @@ function Index() {
                       title={`${(currentPage - 1) * 20 + index + 1}. ${crypto.name}`}
                       subheader={`$${parseFloat(crypto.quote.USD.price).toFixed(2)}`}
                       action={
-                          userData ? (
-                            userData.some(currency => currency.id === crypto.id) ? (
-                              <IconButton onClick={() => handleDeleteTrackClick(crypto.id)}>
-                                <Favorite />
-                              </IconButton>
-                            ) : (
-                              <IconButton onClick={() => handleTrackClick(crypto.id)}>
-                                <FavoriteBorder />
-                              </IconButton>
-                            )
-                          ) : null
-                        }
+                        userData ? (
+                          userData.some(currency => currency.id === crypto.id) ? (
+                            <IconButton onClick={() => handleDeleteTrackClick(crypto.id)}>
+                              <Favorite />
+                            </IconButton>
+                          ) : (
+                            <IconButton onClick={() => handleTrackClick(crypto.id)}>
+                              <FavoriteBorder />
+                            </IconButton>
+                          )
+                        ) : null
+                      }
                     />
                     <CardContent>
                       <Typography
@@ -276,6 +276,13 @@ function Index() {
                       >
                         {crypto.quote.USD.percent_change_24h < 0 ? <ArrowDownward /> : <ArrowUpward />}
                         {parseFloat(crypto.quote.USD.percent_change_24h).toFixed(2)}% (24h)
+                      </Typography>
+                      <Typography
+                        variant="body2"
+                        sx={{ color: crypto.quote.USD.percent_change_7d < 0 ? 'red' : 'green' }}
+                      >
+                        {crypto.quote.USD.percent_change_7d < 0 ? <ArrowDownward /> : <ArrowUpward />}
+                        {parseFloat(crypto.quote.USD.percent_change_7d).toFixed(2)}% (7d)
                       </Typography>
                       <Typography variant="body2" color="textSecondary">
                         Market Cap: ${parseFloat(crypto.quote.USD.market_cap).toLocaleString()}
